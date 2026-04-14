@@ -14,7 +14,7 @@ from ml_highlight import predict_highlights
 from google import genai
 
 # 🔐 SAFE API KEY (USE ENV VARIABLE)
-client = genai.Client(api_key="AIzaSyBIB9V62vC0hHJ_-7qENx0c6KGcICnwuYY")
+client = genai.Client(api_key="Your_Api_KEy")
 
 st.title("⚽ AI Football Commentary Processor")
 
