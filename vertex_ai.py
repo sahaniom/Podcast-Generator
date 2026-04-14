@@ -1,6 +1,6 @@
 from google import genai
 # 🔑 Replace with your API key
-genai.configure(api_key="AIzaSyBIB9V62vC0hHJ_-7qENx0c6KGcICnwuYY")
+genai.configure(api_key="YOUR_API_KEY")
 
 def generate_summary_vertex(text):
 
