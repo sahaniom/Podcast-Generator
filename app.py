@@ -3,9 +3,13 @@ import subprocess
 import requests
 import json
 import os
+from dotenv import load_dotenv
 from faster_whisper import WhisperModel
 from gtts import gTTS
 from preprocess import run_preprocessing
+
+# ✅ Load environment variables
+load_dotenv()
 
 # ✅ ML MODEL
 from ml_highlight import predict_highlights
@@ -14,7 +18,8 @@ from ml_highlight import predict_highlights
 from google import genai
 
 # 🔐 SAFE API KEY (USE ENV VARIABLE)
-client = genai.Client(api_key="Your_Api_KEy")
+API_KEY = os.getenv("GOOGLE_API_KEY")
+client = genai.Client(api_key=API_KEY)
 
 st.title("⚽ AI Football Commentary Processor")
 
