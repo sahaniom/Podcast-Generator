@@ -6,5 +6,7 @@ __pycache__/
 *.mp3
 *.wav
 *.json
-Others
 
+# Temporary files and folders
+Others
+youtube_video_transcript/Audio

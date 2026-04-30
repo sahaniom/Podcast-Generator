@@ -1,3 +1,12 @@
+"""
+This script retrieves an English transcript for a given YouTube video.
+It uses a two-step fallback mechanism:
+1. It first attempts to fetch English captions (or translate existing ones to English) using the YouTube Transcript API.
+2. If captions are unavailable, it automatically downloads the audio via yt-dlp.
+3. It then generates and translates a transcript using the local faster-whisper AI model.
+4. Finally, it cleans up the downloaded audio file after transcription.
+"""
+
 import re
 import os
 import yt_dlp
@@ -22,11 +31,11 @@ def extract_video_id(url):
 # ---------- Step 1: Try captions ----------
 def get_caption_transcript(video_id):
     try:
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en']) # type: ignore
         return " ".join([x['text'] for x in transcript])
     except:
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id) # type: ignore
             for t in transcript_list:
                 try:
                     translated = t.translate('en').fetch()
@@ -48,7 +57,7 @@ def download_audio(url, output="audio.mp3"):
         'noplaylist': True
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl: # type: ignore
         ydl.download([url])
 
     return output
