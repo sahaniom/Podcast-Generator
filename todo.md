@@ -1,3 +1,8 @@
+- In UI there should be two options: from URL and by uploading Audio file.
+    - Mentor at NIC wanted something to be used for office purpose, and whisper is open source locally downloaded so no data is shared.
+    - And maybe we can do something about it, think, like what extra features we can add. like additional preprocessing we are doing in games like counting no. of sixes and all.
+    - instead of json, try to use toon notation and see the result.
+
 # Project Checkpoints
 
 - [ ] **Phase 1: Rule-Based Model**
