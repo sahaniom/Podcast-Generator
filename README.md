@@ -19,6 +19,7 @@ This repository contains modules dedicated to extracting and processing transcri
 
 * **`processing/`**
   * `chunking.py`: Utility module for splitting large texts into manageable chunks to stay within LLM token limits.
+    - Initially chunk size is 3000, but it seems too large for 2B model, so it has been reduced to 1200.
 
 * **`main.py`**: The main entry point to run the full pipeline, from fetching a YouTube transcript to outputting structured JSON data.
 

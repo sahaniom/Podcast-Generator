@@ -1,0 +1,323 @@
+python main.py                     
+Fetching transcript...                                                                         
+🎬 Processing video ID: MAm0RLQpYas
+🔄 Found existing transcript file: C:\Users\DELL\Desktop\Projects\Podcast-Generator\transcript\Transcript\MAm0RLQpYas.txt
+Extracting structured data...
+Chunking transcript...
+Extracting structured data from chunks...
+
+Extracting from chunk:
+ Language: Auto-detected by Whisper (en)
+
+This is the final stage. Hello and welcome to the highlights of the final match of the  Asia Cup 2025 played between arch rivals India and Pakistan in Dubai.   ...
+
+Calling LLM...
+STATUS CODE: 200
+Extracted response:
+ {
+  "teams": [
+    "India",
+    "Pakistan"
+  ],
+  "events": [
+    "Toss won by India (Captain Surya Komar Yadav decided to bowl first)",
+    "Pakistan openers: Jaspeed Bumrah, Fakhar Zaman, Saib Zadha Farhan",
+    "Pakistan bowling: Shaheen Afridi, Haris Rauf, Abdrar Ahmed",
+    "India batting: Abhishek Sharma, Sanju Samson, Shubham Gill, Tilak Verma",
+    "India bowling: Jaspeed Bumrah, Kuldi Piyadav, Varun Chakravarti",
+    "Shivam Dubey bowls first over",
+    "Boundary hit by India",
+    "Deep Midwicket hit by India",
+    "India needed to win in the match",
+    "45 runs for none",
+    "56 runs for none",
+    "11 runs from it"
+  ],
+  "scores": [
+    "45 for none",
+    "56 for none",
+    "11 from it"
+  ],
+  "result": ""
+} 
+
+
+Extracting from chunk:
+ You can see that.  Not a shot.  Bounce a little bit more as well.  Didn't quite middle it.  Peran.  Yes.  He, understandably,  is upset with himself.  He was batting so well.  Pakistan would have want ...
+
+Calling LLM...
+STATUS CODE: 200
+Extracted response:
+ {
+  "sport": "Cricket",
+  "teams": [
+    "India",
+    "Pakistan"
+  ],
+  "events": [
+    "Kuldeep Yadav took the first wicket",
+    "Jasmin Krumra took a catch",
+    "Warren Chakraborty took a catch",
+    "Fokker Zaman dismissed",
+    "Simon Ute passed for 14",
+    "Akshar Patel scored a run",
+    "Sanjeev Samson scored a run",
+    "1st and 2nd wickets gone for Pakistan"
+  ],
+  "score_summary": [
+    "India 84-4-1 into 10th over.",
+    "113 for 2.",
+    "114 for 3.",
+    "126 for 4.",
+    "131 for 5."
+  ],
+  "result": ""
+} 
+
+
+Extracting from chunk:
+ hen ready please.  Go to ball batter when ready please.  Ball batter is coming.  And for the nation is not out.  Getting outside of impact in line.  Fertigy's hitting.  So that from peanut butter.  We ...
+
+Calling LLM...
+STATUS CODE: 200
+Extracted response:
+ **Summary**
+
+*   **Teams:** India and Pakistan
+*   **Sport:** Cricket
+*   **Match:** DP World Asia Cup Final
+*   **Result:** India won the Asia Cup final and sent Pakistan into bat (India won the toss).
+
+*   **Key Events:**
+    *   India won the toss and sent Pakistan into bat.
+    *   The match was in the DP World Asia Cup final on the line.
+    *   India won the Asia Cup final.
+    *   Pakistan lost the ninth wicket (Harris went for 6).
+    *   Shaheen Shah (Pakistan batting) hit 197.66 strike rate.
+    *   Pakistan lost the match to India (146 runs all out in 19.1 overs).
+    *   Gil Anabashek scored 142nd runs.
+    *   Harris scored 147 runs and needed to take the title from 20 overs (implied India won the title with 147 runs needed).
+    *   The other two men are going to be taking guard against Shaheen Shah (Harris).
+    *   Full marks to this Indian team (146 all out in 19.1 overs).
+    *   Shah Shah (Shaheen Shah) is the key figure.
+    *   Babar Azam (Red Bull captain).
+    *   Trubman girl (Babar Azam).
+    *   33 for nine.
+    *   146 runs all out in no time.
+    *   141 for nine.
+    *   146 runs needed to take the title from 20 overs.
+    *   20 overs.
+    *   19.1 overs.
+    *   33 for nine.
+    *   146 runs all out in 19.1 overs.
+    *   146 runs needed to take the title from 20 overs.
+    *   The DP World Asia Cup final on the line.
+    *   Shaheen Shah 197.66 strike rate.
+    *   Babar Azam.
+    *   Trubman girl of course the Red Bull captain.
+    *   Gil Anabashek.
+    *   The other two men are going to be taking guard against Shaheen Shah.
+    *   Full marks to this Indian team.
+    *   India won the toss, sent Pakistan into bat and that is the task in front of this powerful Indian side.
+    *   146 all out in 19.1 overs.
+    *   146 runs needed to take the title from 20 overs.
+    *   147 runs needed to take the title from their 20 overs.
+    *   The DP World Asia Cup final on the line.
+    *   India won the toss, sent Pakistan into bat.
+    *   Pakistan bowled out.
+    *   They've gone from 113 for one to 146 all out in no time.
+    *   33 for nine.
+    *   They were going well... but full marks to this Indian team.
+    *   84, 113, and then an absolute procession of wickets.
+    *   146 and 19.1 overs.
+    *   It's 141 for nine.
+    *   Third wicket... Tilek Worma... 113 for one to 134 for eight.
+    *   Harris Ruff gets his innings.
+    *   113 for one to 134 for eight.
+    *   Nail the Yorker.
+    *   7 off the over.
+    *   Cultured edge.
+    *   Shabab.
+    *   It is last over.
+    *   Shayna Freeti gone without scoring.
+    *   Pakistan in further trouble at 134 for seven.
+    *   Another one.
+    *   The team is going to win the Asia Cup.
+    *   146 for 9 in 19.1 overs.
+    *   147 runs needed to take the title.
+    *   The DP World Asia Cup final on the line.
+    *   India won the toss, sent Pakistan into bat.
+    *   The team is going to win the Asia Cup.
+    *   146 all out in 19.1 overs.
+    *   33 for nine.
+    *   146 and 19.1 overs.
+    *   They've gone from 113 for one to 146 all out in no time.
+    *   33 for nine.
+    *   146 and 19.1 overs.
+    *   The DP World Asia Cup final on the line.
+    *   India won the toss, sent Pakistan into bat.
+    *   The team is going to win the Asia Cup.
+    *   146 for 9 in 19.1 overs.
+    *   147 runs needed to take the title.
+    *   The DP World Asia Cup final on the line.
+    *   India won the toss, sent Pakistan into bat.
+    *   146 for 9 in 19.1 overs.
+    *   147 runs needed to take the title.
+    *   The DP World Asia Cup final on the line.
+    *   India won the toss, sent Pakistan into bat.
+    *   146 for 9 in 19.1 overs.
+    *   147 runs needed to take the title. 
+
+
+Extracting from chunk:
+ y well.  Now he's had to drag that a bit of a slower delivery.  Out, Wicker, thrust up.  For him Ashraf has struck.  That's what they wanted.  They've got Abashek.  Eventually that is massive.  And no ...
+
+Calling LLM...
+STATUS CODE: 200
+Extracted response:
+ {
+  "sport": "Cricket",
+  "teams": [
+    "India",
+    "Pakistan"
+  ],
+  "events": [
+    {
+      "type": "Wicket",
+      "description": "Abashek Sharma has gone"
+    },
+    {
+      "type": "Wicket",
+      "description": "Chirikumar Yadav captain out"
+    },
+    {
+      "type": "Wicket",
+      "description": "Harris Ralf out"
+    },
+    {
+      "type": "Wicket",
+      "description": "Gil out"
+    },
+    {
+      "type": "Wicket",
+      "description": "Sanju Samson wicket"
+    },
+    {
+      "type": "Run",
+      "description": "Gil hit a boundary"
+    },
+    {
+      "type": "Wicket",
+      "description": "Borough bowling out"
+    },
+    {
+      "type": "Wicket",
+      "description": "Gil gone for 12"
+    }
+  ],
+  "score_summary": "India 147",
+  "result": "India throws away match"
+} 
+
+
+Extracting from chunk:
+ slow in pace allowed or give the ball a chance to spin or land it on the  seam and look how the ball spun comfortable catch Sabzad Ibrahim  Burhan I beg your pardon and Pakistan desperately needed a w ...
+
+Calling LLM...
+STATUS CODE: 200
+Extracted response:
+  
+
+
+Extracting from chunk:
+ e with two balls to spare with till like 69 out of 59 53 the top  score and for him three for 29 so congratulations to India by other champions of course they'll  be delighted with this victory winnin ...
+
+Calling LLM...
+STATUS CODE: 200
+Extracted response:
+ {
+    "teams": ["India"],
+    "sport": "Cricket",
+    "score_summary": "69 out of 59, three for 29, 53 the top score",
+    "events": [
+        {"type": "India wins the Asia Cup", "description": "India won the Asia Cup by defeating opponents"},
+        {"type": "congratulations", "description": "India received congratulations from other champions"}
+    ],
+    "result": "winning the Asia Cup"
+} 
+
+Merging results...
+
+--- STRUCTURED OUTPUT ---
+
+{
+    "sport": "Cricket",
+    "teams": [
+        "Pakistan",
+        "India"
+    ],
+    "events": [
+        "Toss won by India (Captain Surya Komar Yadav decided to bowl first)",
+        "Pakistan openers: Jaspeed Bumrah, Fakhar Zaman, Saib Zadha Farhan",
+        "Pakistan bowling: Shaheen Afridi, Haris Rauf, Abdrar Ahmed",
+        "India batting: Abhishek Sharma, Sanju Samson, Shubham Gill, Tilak Verma",
+        "India bowling: Jaspeed Bumrah, Kuldi Piyadav, Varun Chakravarti",
+        "Shivam Dubey bowls first over",
+        "Boundary hit by India",
+        "Deep Midwicket hit by India",
+        "India needed to win in the match",
+        "45 runs for none",
+        "56 runs for none",
+        "11 runs from it",
+        "Kuldeep Yadav took the first wicket",
+        "Jasmin Krumra took a catch",
+        "Warren Chakraborty took a catch",
+        "Fokker Zaman dismissed",
+        "Simon Ute passed for 14",
+        "Akshar Patel scored a run",
+        "Sanjeev Samson scored a run",
+        "1st and 2nd wickets gone for Pakistan",
+        {
+            "type": "Wicket",
+            "description": "Abashek Sharma has gone"
+        },
+        {
+            "type": "Wicket",
+            "description": "Chirikumar Yadav captain out"
+        },
+        {
+            "type": "Wicket",
+            "description": "Harris Ralf out"
+        },
+        {
+            "type": "Wicket",
+            "description": "Gil out"
+        },
+        {
+            "type": "Wicket",
+            "description": "Sanju Samson wicket"
+        },
+        {
+            "type": "Run",
+            "description": "Gil hit a boundary"
+        },
+        {
+            "type": "Wicket",
+            "description": "Borough bowling out"
+        },
+        {
+            "type": "Wicket",
+            "description": "Gil gone for 12"
+        },
+        {
+            "type": "India wins the Asia Cup",
+            "description": "India won the Asia Cup by defeating opponents"
+        },
+        {
+            "type": "congratulations",
+            "description": "India received congratulations from other champions"
+        }
+    ],
+    "score_summary": "69 out of 59, three for 29, 53 the top score",
+    "result": "winning the Asia Cup"
+}

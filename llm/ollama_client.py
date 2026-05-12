@@ -10,6 +10,7 @@ MODEL_NAME = "qwen3.5:2b"
 def call_ollama(prompt):
     """
     Makes a POST request to the local Ollama API to generate a response for the given prompt.
+    Configured with low temperature and top_p to ensure deterministic/factual output.
     Returns the generated response text.
     """
     try:
@@ -19,7 +20,11 @@ def call_ollama(prompt):
                 "model": MODEL_NAME,
                 "prompt": prompt,
                 "stream": False,
-                "temperature": 0
+                # Options to control the model's output quality and format
+                "options": {
+                    "temperature": 0,
+                    "top_p": 0.3
+                }
             }
         )
 
@@ -36,10 +41,9 @@ def call_ollama(prompt):
     except requests.exceptions.RequestException as e:
         print("Ollama Request Failed")
         print(e)
-        
+
         # Log the response content if available for debugging
         if response is not None:
             print(response.text)
 
         raise
-

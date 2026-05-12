@@ -1,4 +1,5 @@
-def chunk_text(text, chunk_size=3000):
+# def chunk_text(text, chunk_size=3000):
+def chunk_text(text, chunk_size=1200):
     """
     Splits the provided text into smaller chunks of a specific size.
     This is useful for processing large transcripts with LLMs that have token limits.

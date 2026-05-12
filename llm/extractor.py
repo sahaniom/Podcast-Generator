@@ -1,5 +1,6 @@
 import json
 import re
+import time
 
 from llm.prompts import EXTRACTION_PROMPT
 from llm.ollama_client import call_ollama
@@ -8,16 +9,17 @@ from processing.chunking import chunk_text
 
 def extract_json(text):
     """
-    Extracts the first valid JSON object found in the given text.
-    Uses regex to find the content between curly braces.
+    Extracts the first valid JSON object found in the given text using a recursive regex.
+    The regex handles nested curly braces to better isolate complete JSON objects.
+    Splits multiple potential JSON objects and returns the first one that parses correctly.
     """
-    match = re.search(r"\{.*\}", text, re.DOTALL)
+    matches = re.findall(r"\{(?:[^{}]|(?:\{[^{}]*\}))*\}", text, re.DOTALL)
 
-    if match:
+    for match in matches:
         try:
-            return json.loads(match.group())
-        except json.JSONDecodeError:
-            return None
+            return json.loads(match)
+        except:
+            continue
 
     return None
 
@@ -26,12 +28,18 @@ def extract_from_chunk(chunk):
     """
     Uses the LLM to extract structured data from a single chunk of text.
     The chunk is injected into the EXTRACTION_PROMPT and sent to Ollama.
+    Logs the raw LLM response to 'debug_llm_output.txt' for analysis.
     """
     print("\nExtracting from chunk:\n", chunk[:200], "...\n")
     prompt = EXTRACTION_PROMPT.format(transcript=chunk)
 
     print("Calling LLM...")
     response = call_ollama(prompt)
+
+    # Log raw output for debugging JSON extraction issues
+    with open("debug_llm_output.txt", "a", encoding="utf-8") as f:
+        f.write(response)
+        f.write("\n\n======================================================\n\n")
 
     print("Extracted response:\n", response, "\n")
     return extract_json(response)
@@ -41,6 +49,7 @@ def merge_results(results):
     """
     Merges multiple extraction results into a single structured output.
     Aggregates sport, teams, events, score summary, and result.
+    Validates event structure and deduplicates teams across chunks.
     """
     final = {
         "sport": "",
@@ -63,10 +72,13 @@ def merge_results(results):
         # Merge teams using a set to deduplicate
         teams.update(r.get("teams", []))
 
-        # Combine all events
-        final["events"].extend(r.get("events", []))
+        # Filter and validate event objects from current chunk
+        for event in r.get("events", []):
+            if isinstance(event, dict):
+                if "type" in event and "description" in event:
+                    final["events"].append(event)
 
-        # Take the most recent score summary and result
+        # Take the most recent score summary and result as they are likely the final state
         if r.get("score_summary"):
             final["score_summary"] = r["score_summary"]
 
@@ -81,9 +93,9 @@ def merge_results(results):
 def llm_extract(transcript):
     """
     Orchestrates the LLM extraction process:
-    1. Chunks the transcript.
-    2. Extracts data from each chunk.
-    3. Merges the results into a single JSON object.
+    1. Chunks the transcript into smaller pieces.
+    2. Sequentially extracts structured data from each chunk using the LLM.
+    3. Merges the results into a single totalized JSON object.
     """
     print("Chunking transcript...")
     chunks = chunk_text(transcript)
@@ -92,11 +104,15 @@ def llm_extract(transcript):
 
     print("Extracting structured data from chunks...")
     print(f"Total chunks to process: {len(chunks)}\n")
-    for chunk in chunks:
+    for i, chunk in enumerate(chunks, 1):
+        chunk_start = time.time()
         parsed = extract_from_chunk(chunk)
+        chunk_end = time.time()
 
         if parsed:
             results.append(parsed)
+        
+        print(f"Chunk {i} processed in {chunk_end - chunk_start:.2f} seconds")
 
     print("Merging results...")
     return merge_results(results)

@@ -1,23 +1,35 @@
 # Prompt designed to guide the LLM in extracting structured data from noisy transcripts.
 # It enforces strict JSON output and provides a blueprint for the expected fields.
+
 EXTRACTION_PROMPT = """
-You are an expert sports analyst.
+You are an information extraction system.
 
-Your task is to convert a noisy sports transcript into structured JSON.
+Your task:
+Convert the sports transcript into STRICT JSON.
 
-Rules:
-1. Detect the sport
-2. Extract teams
-3. Extract important events
-4. Extract score summary
-5. Extract final result
-6. Remove repetitions
-7. Do NOT hallucinate
-8. If information is missing, leave fields empty
+RULES:
+- Output ONLY JSON
+- No markdown
+- No explanations
+- No bullet points
+- No extra text
+- Do not hallucinate
+- If information is missing, use empty string or empty list
+- Event types must be UPPERCASE
+- Keep descriptions short
 
-Output ONLY valid JSON.
+VALID EVENT TYPES:
+WICKET
+FOUR
+SIX
+GOAL
+FOUL
+BOUNDARY
+OUT
+RUN
+CATCH
 
-Format:
+JSON FORMAT:
 
 {{
   "sport": "",
