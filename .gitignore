@@ -3,9 +3,6 @@ venv
 .env
 *.pkl
 __pycache__/
-*.mp3
-*.wav
-*.json
 
 # Temporary files and folders
 youtube_video_transcript/Audio

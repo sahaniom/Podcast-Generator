@@ -2,37 +2,29 @@
 # It enforces strict JSON output and provides a blueprint for the expected fields.
 
 EXTRACTION_PROMPT = """
-You are an information extraction system.
+You are an expert cricket commentary analyzer.
 
-Your task:
-Convert the sports transcript into STRICT JSON.
+Tasks:
+1. Fix transcription/ASR mistakes
+2. Remove repeated commentary
+3. Extract ONLY important cricket events
+4. Do NOT hallucinate
+5. If no event exists, return empty events
 
-RULES:
-- Output ONLY JSON
-- No markdown
-- No explanations
-- No bullet points
-- No extra text
-- Do not hallucinate
-- If information is missing, use empty string or empty list
-- Event types must be UPPERCASE
-- Keep descriptions short
+Valid event types:
+- WICKET
+- FOUR
+- SIX
+- RUN
+- CATCH
+- LBW
 
-VALID EVENT TYPES:
-WICKET
-FOUR
-SIX
-GOAL
-FOUL
-BOUNDARY
-OUT
-RUN
-CATCH
+Output STRICT JSON ONLY.
 
-JSON FORMAT:
+Format:
 
 {{
-  "sport": "",
+  "sport": "cricket",
   "teams": [],
   "events": [
     {{

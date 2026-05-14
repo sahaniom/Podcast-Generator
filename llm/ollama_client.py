@@ -4,7 +4,8 @@ import requests
 OLLAMA_URL = "http://localhost:11434/api/generate"
 
 # The LLM model to use for generation
-MODEL_NAME = "qwen3.5:2b"
+# MODEL_NAME = "qwen3.5:2b"
+MODEL_NAME = "gemma2:2b"
 
 
 def call_ollama(prompt):

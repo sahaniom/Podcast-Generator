@@ -1,42 +1,69 @@
 import json
 import time
+import os
 
 from transcript.transcript_extractor import get_transcript
 from llm.extractor import llm_extract
+from llm.sport_detector import detect_sport
 
 
 def main():
     """
     Main entry point for the Podcast Generator pipeline.
-    It fetches a transcript from a YouTube URL and uses an LLM to extract structured sports data.
     """
+
     start_time = time.time()
+
     url = "https://www.youtube.com/watch?v=MAm0RLQpYas"
 
     print("Fetching transcript...")
-    # Extract the transcript for the specified video URL
     transcript = get_transcript(url)
 
-    print("Extracting structured data...")
-    # Use LLM-based extraction to convert transcript into structured JSON
-    structured_output = llm_extract(transcript)
+    # -----------------------------
+    # NEW: SPORT DETECTION
+    # -----------------------------
+    print("\nDetecting sport...")
+    sport = detect_sport(transcript)
+
+    print(f"Detected sport: {sport}")
+
+    # Reset chunk state for new run
+    if os.path.exists("llm_chunk_state.json"):
+        os.remove("llm_chunk_state.json")
+
+    if os.path.exists("llm_chunk_results.jsonl"):
+        os.remove("llm_chunk_results.jsonl")
+    
+    if os.path.exists("main_output.txt"):
+        os.remove("main_output.txt")
+    
+    if os.path.exists("debug_llm_output.txt"):
+        os.remove("debug_llm_output.txt")
+
+    # -----------------------------
+    # STRUCTURED EXTRACTION
+    # -----------------------------
+    print("\nExtracting structured data...")
+    structured_output = llm_extract(transcript, sport)
 
     print("\n--- STRUCTURED OUTPUT ---\n")
 
-    # Display the final structured data in a pretty-printed JSON format
     output_json = json.dumps(structured_output, indent=4)
     print(output_json)
 
     end_time = time.time()
+
     total_time = end_time - start_time
+
     time_message = f"\nTotal execution time: {total_time:.2f} seconds"
+
     print(time_message)
 
-    # Write the output and execution time to a local file
     with open("main_output.txt", "w", encoding="utf-8") as f:
         f.write("--- STRUCTURED OUTPUT ---\n\n")
         f.write(output_json)
         f.write("\n" + time_message)
+
     print(f"\n💾 Output saved to: main_output.txt")
 
 
