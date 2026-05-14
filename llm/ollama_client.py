@@ -12,7 +12,15 @@ def call_ollama(prompt):
     """
     Makes a POST request to the local Ollama API to generate a response for the given prompt.
     Configured with low temperature and top_p to ensure deterministic/factual output.
-    Returns the generated response text.
+
+    Args:
+        prompt (str): The text prompt to send to the model.
+
+    Returns:
+        str: The generated response text from the model.
+
+    Raises:
+        requests.exceptions.RequestException: If the API call fails or returns an error.
     """
     try:
         response = requests.post(

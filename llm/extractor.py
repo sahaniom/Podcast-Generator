@@ -125,6 +125,10 @@ def merge_results(results):
 
 
 def load_chunk_state():
+    """
+    Loads the number of chunks successfully processed in previous runs.
+    Enables resumability if the script is interrupted.
+    """
     if not os.path.exists(CHUNK_STATE_PATH):
         return 0
 
@@ -137,11 +141,17 @@ def load_chunk_state():
 
 
 def save_chunk_state(processed_count):
+    """
+    Saves the current progress (number of processed chunks) to a state file.
+    """
     with open(CHUNK_STATE_PATH, "w", encoding="utf-8") as f:
         json.dump({"processed_count": processed_count}, f)
 
 
 def load_previous_results(processed_count):
+    """
+    Loads extraction results from previously processed chunks stored in the JSONL file.
+    """
     if processed_count <= 0 or not os.path.exists(CHUNK_RESULTS_PATH):
         return []
 
