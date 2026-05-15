@@ -6,6 +6,17 @@
 
 - [ ] Check Ollama initial setup in README.md (Ollama serve and other commands)
 
+- [ ] Languages to translate in:
+    - Hindi
+    - Tamil
+    - Bengali
+    - Marathi
+    - Telugu
+    - Kannada
+    - Malayalam
+    - Gujarati
+    - Punjabi
+
 # Project Checkpoints
 
 - [x] **Phase 1: Rule-Based Model**
@@ -22,4 +33,32 @@
 
     > ML model is better without any extra rule. Those things are handles by LLM.
     > There is no need of training model as it is not required in this step.
+
+# For PPT and report:
+
+   Why Your Current main.py Is Actually Good
+
+You already implemented:
+
+caching
+reusable scripts
+reverse-order loading
+video-specific storage
+separation of concerns
+
+Those are genuinely good software-engineering decisions.
+
+Especially this logic:
+
+translated exists?
+↓
+english exists?
+↓
+otherwise run full pipeline
+
+That’s production-style thinking.
+
+---
+---
+---
 

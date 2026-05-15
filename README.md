@@ -4,15 +4,14 @@ This repository contains modules dedicated to extracting and processing transcri
 
 ## Prerequisites
 
-This project uses **Ollama** for local LLM processing (Sport Detection, Data Extraction, Podcast Generation, and Translation).
+This project uses **Ollama** for local LLM processing (Sport Detection, Data Extraction, and Podcast Generation) and **IndicTrans2** for high-quality translation into Indic languages.
 
 1.  **Install Ollama**: Download and install from [ollama.com](https://ollama.com/).
-2.  **Pull and Run the Model**: This project uses `gemma2:2b` by default. Run the following in your terminal:
+2.  **Pull the LLM Model**: This project uses `gemma2:2b` by default.
     ```bash
-    ollama run gemma2:2b
+    ollama pull gemma2:2b
     ```
-    > It will automatically pull the model if you don't have it locally. Ensure you have a stable internet connection for the initial setup.
-3.  **Run Ollama**: Ensure the Ollama server is running. On Windows, it usually runs as a tray icon, or you can run `ollama serve` in a separate terminal.
+3.  **IndicTrans2 Requirements**: The translation module uses Hugging Face's `transformers`. Ensure you have sufficient disk space for the `indictrans2-en-indic-1B` model (~2GB) and a GPU (optional but recommended) for faster translation.
 
 ## Initial Setup
 
@@ -70,7 +69,8 @@ pip freeze > requirements.txt
   * `podcast_script_generator.py`: Module that transforms structured match data into a natural, conversational podcast-style narration script using the LLM.
 
 * **`translation/`**
-  * `translator.py`: Module for translating the generated podcast script into target languages while maintaining the original tone and excitement.
+  * `translator.py`: A wrapper module that prioritizes **IndicTrans2** for translating podcast scripts into Indic languages, ensuring natural-sounding commentary.
+  * `indictrans2_translator.py`: The core translation engine using the `ai4bharat/indictrans2-en-indic-1B` model to support languages like Hindi, Bengali, Tamil, etc.
 
 * **`main.py`**: The main entry point that runs the end-to-end pipeline with **caching and resumability**:
   1. **Reverse Check:** Checks if the translated script for the video already exists in `scripts/{video_id}/{language}.txt`.

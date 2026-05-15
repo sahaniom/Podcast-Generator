@@ -30,7 +30,23 @@ def main():
 
     url = "https://www.youtube.com/watch?v=MAm0RLQpYas"
     video_id = extract_video_id(url)
-    target_language = "Hindi"
+    target_language = input("Enter target language: ").strip().title()
+
+    SUPPORTED_LANGUAGES = [
+        "Hindi",
+        "Tamil",
+        "Bengali",
+        "Telugu",
+        "Marathi",
+        "Gujarati",
+        "Kannada",
+        "Malayalam",
+        "Punjabi"
+    ]
+
+    if target_language not in SUPPORTED_LANGUAGES:
+        raise ValueError(f"Unsupported language: {target_language}")
+
 
     # Define paths for check
     en_script_path = os.path.join("scripts", video_id, "english.txt")
