@@ -54,11 +54,15 @@ pip freeze > requirements.txt
 * **`processing/`**
   * `chunking.py`: Utility module for splitting large texts into manageable chunks (default 1200 chars) to stay within LLM context windows.
 
+* **`generation/`**
+  * `podcast_script_generator.py`: Module that transforms structured match data into a natural, conversational podcast-style narration script using the LLM.
+
 * **`main.py`**: The main entry point that runs the end-to-end pipeline:
   1. Fetches transcript from YouTube.
   2. Detects the sport.
   3. Efficiently extracts structured data (highlights, moments, scores) using LLM.
-  4. Saves results to `main_output.txt`.
+  4. **Generates an engaging podcast script** based on the extracted data.
+  5. Saves the final structured output and the podcast script to `main_output.txt`.
 
 * **`youtube_video_transcript/`**
   * `1_get_transcript.py`: A simplified/initial version of the transcript extraction pipeline. It attempts to fetch captions and falls back to audio download and Whisper transcription. Audio files are downloaded directly (usually as `audio.mp3`) and cleaned up immediately after extraction.

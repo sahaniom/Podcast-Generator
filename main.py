@@ -5,6 +5,9 @@ import os
 from transcript.transcript_extractor import get_transcript
 from llm.extractor import llm_extract
 from llm.sport_detector import detect_sport
+from generation.podcast_script_generator import (
+    generate_podcast_script
+)
 
 
 def main():
@@ -68,6 +71,23 @@ def main():
 
     print(f"\n💾 Output saved to: main_output.txt")
 
+    # -----------------------------
+    # STEP 3: PODCAST SCRIPT GENERATION
+    # -----------------------------
+    # Transform the structured match data into an engaging narration script
+    print("\nGenerating podcast script...")
+
+    podcast_script = generate_podcast_script(
+        structured_output
+    )
+
+    print("\n--- PODCAST SCRIPT ---\n")
+    print(podcast_script)
+
+    # Append the podcast script to the main output file
+    with open("main_output.txt", "a", encoding="utf-8") as f:
+        f.write("\n\n--- PODCAST SCRIPT ---\n\n")
+        f.write(podcast_script)
 
 if __name__ == "__main__":
     main()

@@ -4,9 +4,9 @@
     "sport": "cricket",
     "teams": [
         "Fridi",
-        "India",
+        "Pakistan",
         "Abashek",
-        "Pakistan"
+        "India"
     ],
     "events": [
         {
@@ -170,4 +170,14 @@
     "result": "India won the Asia Cup 2025."
 }
 
-Total execution time: 323.24 seconds
+Total execution time: 300.12 seconds
+
+--- PODCAST SCRIPT ---
+
+Alright folks, welcome back to the Cricket Corner! What a nail-biter of a match we just witnessed! Pakistan started strong, putting up a respectable total of 146 runs. But India's batsmen were relentless, chasing that target with grit and determination.  We saw some incredible shots from both sides, including Fakhar Zaman's explosive sixes and Harris Ruff's powerful boundaries.
+
+India's bowlers were on fire! Kuldeep Yadav got his first wicket early on, followed by a string of wickets from Shaheen Afridi and Borough. India's spinners, especially the ever-reliable Varun Chakravarti, kept Pakistan's batsmen under pressure throughout the match. 
+
+The tension was palpable as India closed in on victory.  A few crucial boundaries from Harris Ruff and a brilliant catch by Rinku Singh sealed the deal for India! What a finish! 
+
+India won the Asia Cup 2025 with a comfortable margin, proving their dominance once again. A fantastic display of skill and sportsmanship from both teams. We'll be back next week with more exciting cricket action!
