@@ -2,6 +2,18 @@
 
 This repository contains modules dedicated to extracting and processing transcripts from YouTube videos. The extraction system is designed to automatically gather English transcripts using API fetching or ML-based audio transcription as a fallback.
 
+## Prerequisites
+
+This project uses **Ollama** for local LLM processing (Sport Detection, Data Extraction, Podcast Generation, and Translation).
+
+1.  **Install Ollama**: Download and install from [ollama.com](https://ollama.com/).
+2.  **Pull and Run the Model**: This project uses `gemma2:2b` by default. Run the following in your terminal:
+    ```bash
+    ollama run gemma2:2b
+    ```
+    > It will automatically pull the model if you don't have it locally. Ensure you have a stable internet connection for the initial setup.
+3.  **Run Ollama**: Ensure the Ollama server is running. On Windows, it usually runs as a tray icon, or you can run `ollama serve` in a separate terminal.
+
 ## Initial Setup
 
 Before running the project, it is recommended to use a Python virtual environment to manage dependencies.
@@ -57,12 +69,19 @@ pip freeze > requirements.txt
 * **`generation/`**
   * `podcast_script_generator.py`: Module that transforms structured match data into a natural, conversational podcast-style narration script using the LLM.
 
-* **`main.py`**: The main entry point that runs the end-to-end pipeline:
-  1. Fetches transcript from YouTube.
-  2. Detects the sport.
-  3. Efficiently extracts structured data (highlights, moments, scores) using LLM.
-  4. **Generates an engaging podcast script** based on the extracted data.
-  5. Saves the final structured output and the podcast script to `main_output.txt`.
+* **`translation/`**
+  * `translator.py`: Module for translating the generated podcast script into target languages while maintaining the original tone and excitement.
+
+* **`main.py`**: The main entry point that runs the end-to-end pipeline with **caching and resumability**:
+  1. **Reverse Check:** Checks if the translated script for the video already exists in `scripts/{video_id}/{language}.txt`.
+  2. **English Check:** If translation is missing, it checks for an existing English script in `scripts/{video_id}/english.txt`.
+  3. **Full Pipeline:** If no scripts are found, it fetches the transcript, detects the sport, and extracts structured data.
+  4. **Generation & Storage:** Generates and saves the English podcast script and translated versions in structured folders (`scripts/{video_id}/`).
+
+* **`scripts/`** (Generated)
+  * `{video_id}/`: A folder for each processed video containing:
+    * `english.txt`: The generated English podcast script.
+    * `{language}.txt`: The translated version of the script.
 
 * **`youtube_video_transcript/`**
   * `1_get_transcript.py`: A simplified/initial version of the transcript extraction pipeline. It attempts to fetch captions and falls back to audio download and Whisper transcription. Audio files are downloaded directly (usually as `audio.mp3`) and cleaned up immediately after extraction.
@@ -97,7 +116,12 @@ Execute the `main.py` script:
 python main.py
 ```
 
-The script will fetch the transcript, detect the sport, process it through the LLM, and save the final results to `main_output.txt`.
+The script will follow a **reverse-check logic**:
+1. Check if the **translated script** (`scripts/{video_id}/{language}.txt`) already exists. If yes, it loads it and finishes.
+2. If not, check if the **English podcast script** (`scripts/{video_id}/english.txt`) exists. If yes, it skips generation and goes straight to translation.
+3. If neither exists, it runs the **full pipeline**: fetching the transcript, detecting the sport, extracting structured data, and then generating both the English and translated scripts.
+
+All results are organized in the `scripts/` folder, structured by YouTube video ID.
 
 ### 3. Deactivate the Virtual Environment
 Once you are finished, you can exit the virtual environment:
