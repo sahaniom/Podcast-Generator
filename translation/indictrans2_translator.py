@@ -6,7 +6,7 @@ from transformers import (
 import torch
 
 # High-quality open-source model for English to Indic language translation
-MODEL_NAME = "ai4bharat/indictrans2-en-indic-1B"
+MODEL_NAME = "ai4bharat/indictrans2-en-indic-dist-200M"
 
 
 print("Loading IndicTrans2 model...")
@@ -70,10 +70,12 @@ def translate_to_indic(text, target_language):
         )
 
     # Tokenize input text and move tensors to target device
+    input_text = f"eng_Latn {target_code} {text}"
     batch = tokenizer(
-        [text],
+        [input_text],
         return_tensors="pt",
-        padding=True
+        padding=True,
+        truncation=True
     ).to(device)
 
     # Generate translation using Seq2Seq model
