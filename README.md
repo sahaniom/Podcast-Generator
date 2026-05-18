@@ -82,15 +82,19 @@ pip freeze > requirements.txt
   * `indictrans2_translator.py`: The core translation engine using the `ai4bharat/indictrans2-en-indic-dist-200M` model to support Indic languages like Hindi, Bengali, Tamil, etc.
 
 * **`main.py`**: The main entry point that runs the end-to-end pipeline with **caching and resumability**:
-  1. **Reverse Check:** Checks if the translated script for the video already exists in `scripts/{video_id}/{language_lowercase}.txt` (e.g. `hindi.txt`).
-  2. **English Check:** If translation is missing, it checks for an existing English script in `scripts/{video_id}/english.txt`.
-  3. **Full Pipeline:** If no scripts are found, it fetches the transcript, detects the sport, and extracts structured data.
-  4. **Generation & Storage:** Generates and saves the English podcast script and translated versions in structured folders (`scripts/{video_id}/`).
+  1. **Reverse Check:** Checks if the translated script for the video already exists in `scripts/{video_id}/{language_lowercase}.txt` (e.g., `hindi.txt`). If found, it skips the English generation and translation stages entirely.
+  2. **English Check:** If the translation is missing, it checks for an existing English script in `scripts/{video_id}/english.txt` to avoid regenerating it via LLM.
+  3. **Full Pipeline:** If no scripts are found, it fetches the transcript (API or Whisper), detects the sport, extracts structured match data using local LLMs, and generates/saves the English podcast script.
+  4. **Translation:** Translates the English script into the desired target Indian language using **IndicTrans2** and saves the result.
+  5. **TTS Audio Generation:** Checks if the local language WAV audio already exists at `audio/{video_id}/{language_lowercase}.wav`. If not, it leverages Meta's Massively Multilingual Speech (MMS) models to synthesize high-quality podcast narration and saves it.
 
 * **`scripts/`** (Generated)
   * `{video_id}/`: A folder for each processed video containing:
     * `english.txt`: The generated English podcast script.
-    * `{language_lowercase}.txt`: The translated version of the script (e.g. `hindi.txt`).
+    * `{language_lowercase}.txt`: The translated version of the script (e.g., `hindi.txt`).
+
+* **`audio/`** (Generated)
+  * `{video_id}/`: Cache folder for synthesized local-language WAV audio streams (e.g., `hindi.wav`).
 
 * **`youtube_video_transcript/`**
   * `1_get_transcript.py`: A simplified/initial version of the transcript extraction pipeline. It attempts to fetch captions and falls back to audio download and Whisper transcription. Audio files are downloaded directly (usually as `audio.mp3`) and cleaned up immediately after extraction.
@@ -100,7 +104,11 @@ pip freeze > requirements.txt
   * `Transcript/`: Directory where the final `.txt` transcript files (e.g., `MAm0RLQpYas.txt`) are saved by the script.
 
 * **`tts/`**
-  * `mms_tts.py`: The Text-to-Speech (TTS) generation engine using Facebook's Massively Multilingual Speech (MMS) models from Hugging Face `transformers` (VITS architecture). It dynamically loads and caches models to generate speech from text in various Indic languages.
+  * `mms_tts.py`: The Text-to-Speech (TTS) generation engine using Meta's Massively Multilingual Speech (MMS) models from Hugging Face `transformers` (VITS architecture). Key implementation highlights:
+    * **In-Memory Caching:** Dynamically loads and caches the `AutoTokenizer` and `VitsModel` configurations per language in a persistent dictionary (`_loaded_models`) to avoid CPU/GPU initialization lag on sequential invocations.
+    * **Punctuation-Aware Chunking:** Segments the text into sentence-level chunks using regex positive lookbehinds that process standard Western punctuation (`.`, `!`, `?`) and Devanagari full stops/dandas (`।`) safely.
+    * **WAV Waveform Generation:** Conducts inference in non-gradient mode (`torch.no_grad()`), squeezing and casting audio outputs directly into target WAV frequencies using `soundfile`.
+    * **Natural Stitching:** Stitches individual sentence-level audio files using `pydub`, adding a realistic 400ms pause (`AudioSegment.silent`) between segments to mimic natural human breathing and speech patterns.
 
 * **`test_tts.py`**: A simple verification script to test the local TTS generation pipeline by generating a Hindi audio sample (`audio/test_hindi.wav`).
 
@@ -111,6 +119,7 @@ These modules rely on the following primary Python packages:
 - `faster-whisper`: For local, AI-powered transcription and translation of audio files.
 - `torch` & `transformers`: For PyTorch tensor operations and downloading/running the VitsModel & AutoTokenizer TTS models.
 - `soundfile`: For writing the generated audio waveform to standard `.wav` files.
+- `pydub`: For programmatically stitching sentence-level audio clips together with customizable silent margins.
 
 ## Usage
 To run the full pipeline and generate structured sports data from a YouTube video, follow these steps:
@@ -133,11 +142,11 @@ python main.py
 ```
 
 The script will follow a **reverse-check logic**:
-1. Check if the **translated script** (`scripts/{video_id}/{language_lowercase}.txt`) already exists. If yes, it loads it and finishes.
-2. If not, check if the **English podcast script** (`scripts/{video_id}/english.txt`) exists. If yes, it skips generation and goes straight to translation.
-3. If neither exists, it runs the **full pipeline**: fetching the transcript, detecting the sport, extracting structured data, and then generating both the English and translated scripts.
+1. Check if the **translated script** (`scripts/{video_id}/{language_lowercase}.txt`) already exists. If yes, it loads it and skips directly to generating the localized TTS audio.
+2. If not, check if the **English podcast script** (`scripts/{video_id}/english.txt`) exists. If yes, it skips the English generation and proceeds directly to translation and subsequent TTS generation.
+3. If neither exists, it runs the **full pipeline**: fetching the transcript, detecting the sport, extracting structured data, generating the English script, translating it to the target language, and finally generating the localized TTS audio.
 
-All results are organized in the `scripts/` folder, structured by YouTube video ID.
+All textual results are organized in the `scripts/` folder, and final synthesized speech audio is saved in the `audio/` folder, both structured by YouTube video ID.
 
 ### 3. Deactivate the Virtual Environment
 Once you are finished, you can exit the virtual environment:

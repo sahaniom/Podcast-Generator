@@ -4,3 +4,4 @@
 * pip install youtube-transcript-api
 * pip install torch
 * pip install transformers==4.38.2
+* pip install streamlit
