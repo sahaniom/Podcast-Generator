@@ -187,11 +187,43 @@ def main(url=None, target_language=None):
     # STEP 4: TRANSLATION
     # -----------------------------
     # Translate the English script if the translated version isn't already available
-    if not translated_script and podcast_script:
-        print(f"\nTranslating to {target_language}...")
-        translated_script = translate_script(podcast_script, target_language)
-        save_script(video_id, target_language, translated_script)
-        print(f"✅ Translated script saved to {translated_script_path}")
+    # if not translated_script and podcast_script:
+    #     print(f"\nTranslating to {target_language}...")
+    #     translated_script = translate_script(podcast_script, target_language)
+    #     save_script(video_id, target_language, translated_script)
+    #     print(f"✅ Translated script saved to {translated_script_path}")
+    # Step 4: Translation
+    if target_language == "English":
+        if podcast_script:
+            translated_script = podcast_script
+        else:
+            with open(
+                en_script_path,
+                "r",
+                encoding="utf-8"
+            ) as f:
+                translated_script = f.read()
+
+        print("\nSkipping translation for English.")
+
+    else:
+        if not translated_script and podcast_script:
+            print(f"\nTranslating to {target_language}...")
+            translated_script = translate_script(
+                podcast_script,
+                target_language
+            )
+
+            save_script(
+                video_id,
+                target_language,
+                translated_script
+            )
+
+            print(
+                f"✅ Translated script saved to "
+                f"{translated_script_path}"
+            )
 
     # -----------------------------
     # STEP 5: TEXT-TO-SPEECH (TTS) AUDIO GENERATION
