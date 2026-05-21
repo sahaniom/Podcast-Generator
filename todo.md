@@ -1,4 +1,4 @@
-- [ ] no we don't do that maybe later i'll do some changes in streamlit only otherwise i think the project is completed
+- [x] no we don't do that maybe later i'll do some changes in streamlit only otherwise i think the project is completed
 
 - [ ] In UI there should be two options: from URL and by uploading Audio file.
     - Mentor at NIC wanted something to be used for office purpose, and whisper is open source locally downloaded so no data is shared.
@@ -6,9 +6,9 @@
 
 - [ ] While deploying add youtube cookies to download audio from youtube using yt_dlp.
 
-- [ ] Check Ollama initial setup in README.md (Ollama serve and other commands)
+- [x] Check Ollama initial setup in README.md (Ollama serve and other commands)
 
-- [ ] Languages to translate in:
+- [x] Languages to translate in:
     - Hindi
     - Tamil
     - Bengali

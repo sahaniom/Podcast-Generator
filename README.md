@@ -74,6 +74,12 @@ pip freeze > requirements.txt
 * **`processing/`**
   * `chunking.py`: Utility module for splitting large texts into manageable chunks (default 1200 chars) to stay within LLM context windows.
 
+* **`audio_processing/`**
+  * `podcast_mixer.py`: A specialized module for mixing synthesized voice audio with musical elements. 
+    * **Layered Mixing**: Overlays the main voice track with looped background music at reduced volume.
+    * **Transitions**: Automatically handles 1000ms fade-ins/outs for intro and outro music to ensure professional audio transitions.
+    * **Dynamic Looping**: Extends background music to match the duration of the speech audio.
+
 * **`generation/`**
   * `podcast_script_generator.py`: Module that transforms structured match data into a natural, conversational podcast-style narration script using the LLM.
 
@@ -81,6 +87,8 @@ pip freeze > requirements.txt
   * `translator.py`: A wrapper module that routes translations directly to the **IndicTrans2** translation engine for translating podcast scripts into Indic languages (the alternative local LLM-based translation logic is commented out for reference).
   * `indictrans2_translator.py`: The core translation engine using the `ai4bharat/indictrans2-en-indic-dist-200M` model to support Indic languages like Hindi, Bengali, Tamil, etc.
 
+* **`app.py`**: A **Streamlit-based web interface** for the Podcast Generator. It allows users to enter a YouTube URL, select a target language, and generate/download the final podcast audio directly from the browser.
+* **`config.py`**: Central configuration file containing supported languages, audio paths for intro/outro/background music, and volume/duration settings for the mixer.
 * **`main.py`**: The main entry point that runs the end-to-end pipeline with **caching and resumability**:
   1. **Reverse Check:** Checks if the translated script for the video already exists in `scripts/{video_id}/{language_lowercase}.txt` (e.g., `hindi.txt`). If found, it skips the English generation and translation stages entirely.
   2. **English Check:** If the translation is missing, it checks for an existing English script in `scripts/{video_id}/english.txt` to avoid regenerating it via LLM.
@@ -98,13 +106,22 @@ pip freeze > requirements.txt
 
 * **`youtube_video_transcript/`**
   * `1_get_transcript.py`: A simplified/initial version of the transcript extraction pipeline. It attempts to fetch captions and falls back to audio download and Whisper transcription. Audio files are downloaded directly (usually as `audio.mp3`) and cleaned up immediately after extraction.
-  * `2_get_transcript.py`: An enhanced version of the extraction script similar to `transcript_extractor.py`. It caches the downloaded audio into the `youtube_video_transcript/Audio/` directory by video ID to prevent re-downloads, includes translation capabilities, and saves the final transcript to the `youtube_video_transcript/Transcript/` directory.
-  * `README.md`: A localized README specifically for this pipeline variant.
-  * `Audio/`: Cache directory for audio downloaded by `2_get_transcript.py`.
-  * `Transcript/`: Directory where the final `.txt` transcript files (e.g., `MAm0RLQpYas.txt`) are saved by the script.
+  * `2_get_transcript.core Text-to-Speech (TTS) engine using Meta's Massively Multilingual Speech models.
+  * `dialogue_tts.py`: An orchestration layer for multi-speaker podcasts. 
+    * **Dialogue Parsing**: Extracts dialogue blocks using regex tags like `[HOST]`, `[GUEST]`, and `[NARRATOR]`.
+    * **Speaker Styling**: Simulates different voices by programmatically adjusting pitch, speed, and volume per speaker tag.
+    * **Audio Stitching**: Segments the script into manageable chunks for TTS and merges them with natural-sounding pauses.
 
-* **`tts/`**
-  * `mms_tts.py`: The Text-to-Speech (TTS) generation engine using Meta's Massively Multilingual Speech (MMS) models from Hugging Face `transformers` (VITS architecture). Key implementation highlights:
+* **`utils/`**
+  * `speaker_utils.py`: Utilities for randomly assigning localized names to generic speaker tags and replacing them within scripts for a more personalized feel.
+  * `tag_utils.py`: Logic to protect special speaker tags during the translation process by swapping them with unique placeholders that are restored post-translation.
+
+* **`test_tts.py`**: A simple verification script to test the local TTS generation pipeline by generating a Hindi audio sample (`audio/test_hindi.wav`).
+* **`test_podcast_mix.py`**: A utility script to test the audio mixing logic by combining a test voice file with intro, background, and outro music.
+
+* **`assets/`**: Directory containing static audio resources such as `intro_music.mp3` and `background_music.mp3` used during the mixing phase.
+
+* **`outputs/`**: The final destination for fully mixed podcasts (e.g., `outputs/final_podcasters` (VITS architecture). Key implementation highlights:
     * **In-Memory Caching:** Dynamically loads and caches the `AutoTokenizer` and `VitsModel` configurations per language in a persistent dictionary (`_loaded_models`) to avoid CPU/GPU initialization lag on sequential invocations.
     * **Punctuation-Aware Chunking:** Segments the text into sentence-level chunks using regex positive lookbehinds that process standard Western punctuation (`.`, `!`, `?`) and Devanagari full stops/dandas (`।`) safely.
     * **WAV Waveform Generation:** Conducts inference in non-gradient mode (`torch.no_grad()`), squeezing and casting audio outputs directly into target WAV frequencies using `soundfile`.
