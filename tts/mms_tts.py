@@ -10,6 +10,7 @@ from transformers import VitsModel, AutoTokenizer
 # Mapping of supported natural languages to Meta's MMS (Massively Multilingual Speech)
 # pre-trained VITS Text-to-Speech model identifiers hosted on Hugging Face.
 LANGUAGE_MODELS = {
+    "English": "facebook/mms-tts-eng",
     "Hindi": "facebook/mms-tts-hin",
     "Tamil": "facebook/mms-tts-tam",
     "Bengali": "facebook/mms-tts-ben",

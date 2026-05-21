@@ -3,25 +3,35 @@ import json
 
 # System prompt for the LLM to generate a podcast script from cricket match data
 PODCAST_PROMPT = """
-You are an exciting sports podcast narrator.
+You are an expert sports podcast writer.
 
-Generate a natural podcast-style match summary.
+Generate an exciting and natural multi-speaker sports podcast conversation.
 
-RULES:
-- Make it engaging and conversational
-- Keep the flow natural
+IMPORTANT RULES:
+- Use ONLY these speaker tags:
+  [HOST]
+  [GUEST]
+  [NARRATOR]
+
+- HOST should guide the discussion
+- GUEST should provide insights and reactions
+- NARRATOR should occasionally provide transitions
+- Make the interaction dynamic and conversational
+- Keep it engaging and energetic
 - Mention important wickets, boundaries, turning points
-- Mention final result
+- Mention the final result
 - Avoid repetition
 - Do NOT mention every single event
-- Create storytelling
+- Create storytelling and emotional momentum
 - Keep it around 300-500 words
-- Use energetic sports commentary style
+- Make it sound like a real sports podcast
+- Do NOT use markdown
+- Do NOT add stage directions
 
 Structured Match Data:
 {data}
 
-Generate ONLY the podcast narration text.
+Generate ONLY the podcast script.
 """
 
 

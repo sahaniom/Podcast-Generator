@@ -1,4 +1,5 @@
 SUPPORTED_LANGUAGES = [
+    "English",
     "Hindi",
     "Tamil",
     "Bengali",

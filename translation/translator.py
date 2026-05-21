@@ -1,27 +1,66 @@
+import re
+
 from translation.indictrans2_translator import (
     translate_to_indic
 )
 
 
+def parse_dialogue(script):
+    """
+    Extract speaker dialogue blocks.
+    """
+
+    pattern = r"\[(HOST|GUEST|NARRATOR)\]\s*(.*?)(?=\[(HOST|GUEST|NARRATOR)\]|$)"
+
+    matches = re.findall(
+        pattern,
+        script,
+        re.DOTALL
+    )
+
+    dialogue = []
+
+    for match in matches:
+
+        speaker = match[0]
+
+        text = match[1].strip()
+
+        if text:
+
+            dialogue.append({
+                "speaker": speaker,
+                "text": text
+            })
+
+    return dialogue
+
+
 def translate_script(script, language):
     """
-    Translates a podcast script into a target Indic language.
-    
-    This function acts as a wrapper for the IndicTrans2 translator,
-    allowing the main pipeline to remain agnostic of the underlying 
-    translation engine.
-
-    Args:
-        script (str): The English podcast script content.
-        language (str): Destination Indic language (e.g., 'Hindi', 'Gujarati').
-
-    Returns:
-        str: The translated script text.
+    Translate dialogue block-by-block.
     """
-    return translate_to_indic(
-        script,
-        language
-    )
+
+    dialogue = parse_dialogue(script)
+
+    translated_blocks = []
+
+    for item in dialogue:
+
+        speaker = item["speaker"]
+        text = item["text"]
+
+        translated_text = translate_to_indic(
+            text,
+            language
+        )
+
+        translated_blocks.append(
+            f"[{speaker}]\n{translated_text}"
+        )
+
+    return "\n\n".join(translated_blocks)
+
 
 
 # * Following code is using Ollama LLM models for translation either Gemma2:2b or Qwen3.5:2b, but now we are using IndicTrans2 for translation. So this file is not being used currently, but we are keeping it for future reference if needed.

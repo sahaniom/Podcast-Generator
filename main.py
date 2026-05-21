@@ -1,7 +1,8 @@
 import json
 import time
 import os
-from tts.mms_tts import generate_tts
+# from tts.mms_tts import generate_tts
+from tts.dialogue_tts import generate_dialogue_tts
 from audio_processing.podcast_mixer import create_podcast
 from config import SUPPORTED_LANGUAGES
 
@@ -204,8 +205,8 @@ def main(url=None, target_language=None):
             print(f"\nGenerating {target_language} podcast audio...")
 
             # Run text-to-speech synthesis
-            generate_tts(
-                text=translated_script,
+            generate_dialogue_tts(
+                script=translated_script,
                 language=target_language,
                 output_path=audio_output_path
             )

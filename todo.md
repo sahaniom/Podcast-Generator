@@ -1,3 +1,5 @@
+- [ ] no we don't do that maybe later i'll do some changes in streamlit only otherwise i think the project is completed
+
 - [ ] In UI there should be two options: from URL and by uploading Audio file.
     - Mentor at NIC wanted something to be used for office purpose, and whisper is open source locally downloaded so no data is shared.
     - And maybe we can do something about it, think, like what extra features we can add. like additional preprocessing we are doing in games like counting no. of sixes and all.
@@ -33,6 +35,8 @@
 
     > ML model is better without any extra rule. Those things are handles by LLM.
     > There is no need of training model as it is not required in this step.
+
+
 
 # For PPT and report:
 
