@@ -4,7 +4,7 @@ from llm.ollama_client import call_ollama
 # System prompt to generate a concise summary from the transcript
 SUMMARY_PROMPT = """
 You are an expert sports commentator.
-Based on the following transcript of a {sport} match, generate a medium length, engaging summary of the match in maximum of 10 sentences.
+Based on the following transcript of a {sport} match, generate a detailed summary of the match.
 
 IMPORTANT RULES:
 - Write all numbers and scores as words in English (e.g., write 'three' instead of '3', 'ten' instead of '10', 'one hundred forty-six' instead of '146').
