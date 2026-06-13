@@ -29,11 +29,11 @@ flowchart TD
     User[User]
     YouTube[YouTube Video]
     System[AI Multilingual Podcast Generator]
-    Output[Generated Podcast Audio]
+    Output[Generated Podcast Audio with Spoken Summary]
 
     User -->|Enter URL & Language| System
     YouTube -->|Transcript Data| System
-    System -->|Podcast Audio + Script| Output
+    System -->|Summary Audio + Podcast Audio + Script| Output
 ```
 
 ---
@@ -49,25 +49,30 @@ flowchart TD
 
     A[Transcript Extraction]
     B[Sport Detection & Structured Extraction]
-    C[Podcast Script Generation]
-    D[Translation Engine]
-    E[Dialogue-aware TTS]
-    F[Podcast Audio Mixer]
-    G[Final Podcast Output]
+    C[Summary Generation]
+    D[Podcast Script Generation]
+    E[Translation Engine]
+    F[Dialogue-aware TTS]
+    G[Podcast Audio Mixer]
+    H[Summary TTS and Final Merge]
+    I[Final Podcast Output]
 
     User -->|YouTube URL + Language| A
 
     A -->|Transcript| B
 
-    B -->|Structured Sports Data| C
+    B -->|Transcript + Sport Context| C
 
-    C -->|English Podcast Script| D
+    B -->|Structured Sports Data| D
 
-    D -->|Translated Dialogue Script| E
+    C -->|Summary Text| E
+    D -->|English Podcast Script| E
 
-    E -->|Speech Audio| F
+    E -->|Translated Summary + Dialogue Script| F
 
-    F -->|Mixed Podcast Audio| G
+    F -->|Summary Audio + Dialogue Audio| G
+    G -->|Mixed Podcast Body| H
+    H -->|Final Podcast WAV| I
 ```
 
 ---
@@ -92,6 +97,7 @@ flowchart TD
 
     %% LLM LAYER
     S1[Sport Detector]
+    S3[Summary Generator]
     S2[Structured Match Extractor]
 
     %% GENERATION
@@ -111,6 +117,7 @@ flowchart TD
     A1[Podcast Mixer]
     A2[Background Music]
     A3[Intro/Outro Audio]
+    A4[Summary + Podcast Merger]
 
     %% OUTPUT
     O1[Generated Podcast WAV]
@@ -125,8 +132,10 @@ flowchart TD
     T2 --> T1
 
     T1 --> S1
+    S1 --> S3
     S1 --> S2
 
+    S3 --> TR2
     S2 --> G1
 
     G1 --> TR1
@@ -139,11 +148,14 @@ flowchart TD
     TT3 --> TT4
 
     TT4 --> A1
+    TT4 --> A4
 
     A2 --> A1
     A3 --> A1
 
-    A1 --> O1
+    A1 --> A4
+
+    A4 --> O1
 
     O1 --> O2
 ```
@@ -155,6 +167,7 @@ flowchart TD
 This version includes:
 
 * scripts cache
+* summary cache
 * audio cache
 * outputs
 
@@ -172,16 +185,19 @@ flowchart TD
 
     %% STORAGE
     SCRIPTS[(Scripts Cache)]
+    SUMMARY[(Summary Cache)]
     AUDIO[(Audio Cache)]
     OUTPUTS[(Podcast Outputs)]
 
     %% PROCESSING
     T[Transcript Extraction]
     LLM[LLM Processing]
+    SUM[Summary Generation]
     GEN[Podcast Script Generation]
     TRANS[Translation Engine]
     TTS[TTS Synthesis]
     MIX[Podcast Audio Mixing]
+    MERGE[Final Summary and Podcast Merge]
 
     %% FLOW
     U --> UI
@@ -192,10 +208,13 @@ flowchart TD
 
     T --> LLM
 
+    LLM --> SUM
     LLM --> GEN
 
+    SUM --> SUMMARY
     GEN --> SCRIPTS
 
+    SUMMARY --> TRANS
     SCRIPTS --> TRANS
 
     TRANS --> AUDIO
@@ -203,8 +222,10 @@ flowchart TD
     AUDIO --> TTS
 
     TTS --> MIX
+    TTS --> MERGE
+    MIX --> MERGE
 
-    MIX --> OUTPUTS
+    MERGE --> OUTPUTS
 
     OUTPUTS --> UI
 ```
@@ -234,24 +255,26 @@ graph TD
         C[Transcript Extraction]
         D[Sport Detection]
         E[Structured Extraction]
-        F[Podcast Script Generator]
-        G[Translation Engine]
+        F[Summary Generator]
+        G[Podcast Script Generator]
+        H[Translation Engine]
     end
 
     subgraph Speech Layer
-        H[Dialogue TTS]
-        I[MMS-TTS Models]
+        I[Dialogue TTS]
+        J[MMS-TTS Models]
     end
 
     subgraph Audio Layer
-        J[Podcast Mixer]
-        K[Music Processing]
+        K[Podcast Mixer]
+        L[Summary and Podcast Merger]
     end
 
     subgraph Storage
-        L[(Scripts)]
-        M[(Audio)]
-        N[(Outputs)]
+        M[(Scripts)]
+        N[(Summaries)]
+        O[(Audio)]
+        P[(Outputs)]
     end
 
     A --> B
@@ -259,18 +282,22 @@ graph TD
     B --> C
     C --> D
     D --> E
-    E --> F
-    F --> G
-
+    D --> F
+    E --> G
+    F --> H
     G --> H
+
     H --> I
-
     I --> J
-    J --> K
 
-    F --> L
-    H --> M
-    J --> N
+    J --> K
+    J --> L
+    K --> L
+
+    F --> N
+    G --> M
+    I --> O
+    L --> P
 ```
 
 ---

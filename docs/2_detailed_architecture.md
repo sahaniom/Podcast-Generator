@@ -21,8 +21,9 @@
 │ • Input validation                                                       │
 │ • Reverse caching logic                                                  │
 │ • Coordinates all AI modules                                             │
-│ • Handles script/audio generation flow                                   │
+│ • Handles podcast + summary generation flow                              │
 │ • Executes translation + TTS + mixing                                    │
+│ • Merges spoken summary with the final mixed podcast                     │
 │ • Returns final podcast path                                             │
 └───────────────────────────────┬──────────────────────────────────────────┘
                                 │
@@ -36,8 +37,12 @@
 │ audio/<video_id>/            │    │------------------------------│
 │ outputs/<video_id>/          │    │ • Supported languages        │
 │                              │    │ • Music paths                │
-│ • Prevents recomputation     │    │ • Audio configs              │
-│ • Stores intermediate files  │    │ • Constants                  │
+│ • Caches podcast scripts     │    │ • Audio configs              │
+│ • Caches summary scripts     │    │ • Constants                  │
+│ • Caches summary audio       │    │                              │
+│ • Prevents recomputation     │    │ main.py                      │
+│ • Stores intermediate files  │    │ • Language-specific          │
+│                              │    │   spoken summary phrases     │
 └──────────────────────────────┘    └──────────────────────────────┘
 
 
@@ -101,7 +106,27 @@
 
 
 ══════════════════════════════════════════════════════════════════════════════
-3️⃣ PODCAST SCRIPT GENERATION LAYER
+3️⃣ SUMMARY GENERATION LAYER
+══════════════════════════════════════════════════════════════════════════════
+
+                                ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    llm/summary_generator.py                             │
+│--------------------------------------------------------------------------│
+│ INPUT: Transcript + Sport Context                                        │
+│                                                                          │
+│ Responsibilities:                                                        │
+│ • Generate a short match recap using a dedicated LLM prompt              │
+│ • Truncate very long transcripts before summary generation               │
+│ • Convert numeric digits into spoken English words                       │
+│ • Return plain text suitable for translation and TTS                     │
+│                                                                          │
+│ OUTPUT: English summary text                                             │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+══════════════════════════════════════════════════════════════════════════════
+4️⃣ PODCAST SCRIPT GENERATION LAYER
 ══════════════════════════════════════════════════════════════════════════════
 
                                 ▼
@@ -132,7 +157,7 @@
 
 
 ══════════════════════════════════════════════════════════════════════════════
-4️⃣ MULTILINGUAL TRANSLATION LAYER
+5️⃣ MULTILINGUAL TRANSLATION LAYER
 ══════════════════════════════════════════════════════════════════════════════
 
                                 ▼
@@ -160,6 +185,9 @@
 │--------------------------------------------------------------------------│
 │ Uses AI4Bharat IndicTrans2                                               │
 │                                                                          │
+│ Also handles:                                                            │
+│ • summary translation for non-English target languages                   │
+│                                                                          │
 │ Supported Languages:                                                     │
 │ • Hindi                                                                  │
 │ • Tamil                                                                  │
@@ -177,7 +205,7 @@
 
 
 ══════════════════════════════════════════════════════════════════════════════
-5️⃣ DIALOGUE-AWARE TTS LAYER
+6️⃣ DIALOGUE-AWARE TTS LAYER
 ══════════════════════════════════════════════════════════════════════════════
 
                                 ▼
@@ -225,7 +253,7 @@
 
 
 ══════════════════════════════════════════════════════════════════════════════
-6️⃣ AUDIO POST-PROCESSING LAYER
+7️⃣ AUDIO POST-PROCESSING LAYER
 ══════════════════════════════════════════════════════════════════════════════
 
                                 ▼
@@ -240,16 +268,31 @@
 │ • Add outro music                                                        │
 │ • Fade in/out                                                            │
 │ • Volume balancing                                                       │
-│ • Final podcast export                                                   │
+│ • Create podcast body before summary merge                               │
 │                                                                          │
 │ Uses Pydub audio processing                                              │
+│                                                                          │
+│ OUTPUT: Mixed podcast body WAV                                           │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+                                ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    main.py audio merge stage                            │
+│--------------------------------------------------------------------------│
+│ INPUT: Summary WAV + Mixed podcast body WAV                              │
+│                                                                          │
+│ Responsibilities:                                                        │
+│ • Prefix the spoken summary before the main podcast                      │
+│ • Insert a short silent pause between both segments                      │
+│ • Export the final combined podcast file                                 │
 │                                                                          │
 │ OUTPUT: Final cinematic podcast                                          │
 └──────────────────────────────────────────────────────────────────────────┘
 
 
 ══════════════════════════════════════════════════════════════════════════════
-7️⃣ FINAL OUTPUT LAYER
+8️⃣ FINAL OUTPUT LAYER
 ══════════════════════════════════════════════════════════════════════════════
 
                                 ▼
@@ -257,9 +300,12 @@
 │                           OUTPUTS                                       │
 │--------------------------------------------------------------------------│
 │ scripts/<video_id>/english.txt                                           │
+│ scripts/<video_id>/summary_english.txt                                   │
 │ scripts/<video_id>/hindi.txt                                             │
+│ scripts/<video_id>/summary_hindi.txt                                     │
 │                                                                          │
 │ audio/<video_id>/hindi.wav                                               │
+│ audio/<video_id>/summary_hindi.wav                                       │
 │                                                                          │
 │ outputs/<video_id>/hindi_podcast.wav                                     │
 │                                                                          │

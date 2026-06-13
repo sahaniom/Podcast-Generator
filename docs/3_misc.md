@@ -30,10 +30,12 @@ This project goes far beyond that by building a complete:
 The system:
 
 * extracts sports commentary from YouTube videos
+* generates a short match summary alongside the full podcast script
 * understands match events using LLMs
 * generates dynamic multi-speaker podcast scripts
 * translates them into multiple Indic languages
 * synthesizes natural speech using multilingual TTS
+* prepends a spoken summary before the main podcast audio
 * mixes cinematic podcast audio with music
 * delivers a complete downloadable podcast experience through a web UI
 
@@ -111,8 +113,11 @@ This is a real software engineering pattern used in production systems.
 The project avoids unnecessary recomputation by caching:
 
 * English scripts
+* English summaries
 * translated scripts
+* translated summaries
 * synthesized audio
+* summary audio segments
 * final podcast outputs
 
 This significantly reduces:
@@ -120,6 +125,8 @@ This significantly reduces:
 * execution time
 * API/model calls
 * development iteration cost
+
+It also makes partial reruns cheaper, because the system can regenerate only the missing summary, translation, or audio branch instead of repeating the full pipeline.
 
 ---
 
@@ -142,6 +149,31 @@ The solution involved:
 * speaker metadata preservation
 
 This dramatically improved multilingual translation quality.
+
+---
+
+## ✅ Added a Dual Output Generation Flow
+
+The latest version of the pipeline now creates two related deliverables from the same transcript:
+
+* a detailed multi-speaker podcast script
+* a shorter match summary
+
+That summary is translated, converted into speech, and inserted before the main podcast so listeners hear a concise recap before the longer discussion starts.
+
+---
+
+## ✅ Added Summary-Specific Reliability Guards
+
+The summary path now has its own safeguards for cleaner audio output.
+
+It:
+
+* truncates very long transcripts before calling the local LLM
+* converts numeric digits into words after generation
+* keeps the returned text plain so translation and TTS remain stable
+
+This is especially useful for sports content where scores, overs, and match statistics sound awkward if numeric digits leak into synthesized speech.
 
 ---
 
@@ -191,6 +223,7 @@ The MVP of the project is:
 Core MVP capabilities include:
 
 * YouTube transcript extraction
+* short spoken match summary generation
 * sports event understanding
 * podcast-style script generation
 * multilingual translation
@@ -228,6 +261,7 @@ Learned:
 * structured extraction
 * conversational generation
 * dialogue formatting
+* summary generation with post-processing safeguards
 
 ---
 
@@ -239,6 +273,7 @@ Learned real-world issues involving:
 * speaker tag corruption
 * formatting preservation
 * contextual translation quality
+* numeric score rendering in spoken summaries
 
 and how to solve them through:
 
@@ -256,6 +291,7 @@ Learned:
 * audio stitching
 * speaker-aware synthesis
 * voice styling simulation
+* summary-first audio composition
 
 ---
 
@@ -271,6 +307,7 @@ to implement:
 * fades
 * audio merging
 * volume balancing
+* summary + podcast concatenation with spacing
 
 ---
 

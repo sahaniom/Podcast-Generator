@@ -9,23 +9,30 @@ YouTube Video
     ↓
 Transcript Extraction
     ↓
-Structured Match Understanding
+Sport Detection
     ↓
-LLM Podcast Script Generation
-    ↓
-Multi-Speaker Dialogue Formatting
-    ↓
-Multilingual Translation
-    ↓
-Dialogue-Aware TTS
-    ↓
-Audio Stitching
-    ↓
-Podcast Music Mixing
-    ↓
-Final Podcast Output
-    ↓
-Streamlit UI
+ ┌───────────────────────────────┬────────────────────────────────┐
+ │                               │                                │
+ ↓                               ↓                                │
+Match Summary Generation         Structured Match Understanding   │
+ ↓                               ↓                                │
+Summary Translation              LLM Podcast Script Generation    │
+ ↓                               ↓                                │
+Summary TTS                      Multi-Speaker Dialogue Formatting │
+ ↓                               ↓                                │
+ └───────────────┬───────────────┴────────────────────────────────┘
+                 ↓
+         Multilingual Translation
+                 ↓
+         Dialogue-Aware TTS
+                 ↓
+         Podcast Music Mixing
+                 ↓
+      Summary + Podcast Audio Merge
+                 ↓
+          Final Podcast Output
+                 ↓
+             Streamlit UI
 ```
 
 ---
@@ -68,6 +75,8 @@ Responsibilities:
 * cache checking
 * pipeline execution
 * coordination between modules
+* summary generation and summary-specific caching
+* final audio assembly by merging summary narration with the mixed podcast
 
 ---
 
@@ -147,6 +156,23 @@ like:
 * turning points
 * players
 * match result
+
+---
+
+### 📄 `llm/summary_generator.py`
+
+Creates a short match summary directly from the transcript before full podcast generation.
+
+Key behaviors:
+
+* uses a dedicated summary prompt with sport context
+* truncates very long transcripts to a safe length before calling the local LLM
+* post-processes generated text so numeric digits are converted into words
+* returns plain text that can be translated and spoken as a short intro segment
+
+This adds:
+
+# 🎯 quick-listen match recap generation
 
 ---
 
@@ -371,15 +397,24 @@ Avoid expensive recomputation.
 Your pipeline intelligently caches:
 
 * English scripts
+* English summaries
 * translated scripts
+* translated summaries
 * synthesized audio
+* summary audio
 * final podcast outputs
 
 Example:
 
 ```text id="m7r5vq"
 scripts/<video_id>/
+    english.txt
+    summary_english.txt
+    <language>.txt
+    summary_<language>.txt
 audio/<video_id>/
+    <language>.wav
+    summary_<language>.wav
 outputs/<video_id>/
 ```
 
@@ -388,6 +423,7 @@ This significantly improves:
 * performance
 * developer workflow
 * scalability
+* reruns where only summary, translation, or audio artifacts are missing
 
 ---
 
