@@ -1,0 +1,3 @@
+Language: Auto-detected by Whisper (en)
+
+Your website is fast. For the people right next door, what about your customers around the world?  Like a traffic jam on a highway, traditional routing of requests on the internet can result  in congestion, slowing down your visitors. Argo Smart Routing, a part of Cloudflare's  smart shield, acts like a global GPS. It analyzes real-time network congestion and  intelligently routes your dynamic data across the fastest, most reliable paths.  Give your customers everywhere the fast, reliable experience they deserve at cloudflare.com.

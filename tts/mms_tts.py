@@ -96,29 +96,47 @@ def split_text_into_chunks(text):
 def generate_single_chunk(text, tokenizer, model, output_path):
     """
     Synthesizes speech for a single text sentence chunk and saves it as a WAV file.
-
-    Parameters:
-    ----------
-    text : str
-        A single sentence of text to synthesize.
-    tokenizer : AutoTokenizer
-        The tokenizer corresponding to the loaded language model.
-    model : VitsModel
-        The loaded VitsModel instance.
-    output_path : str
-        The path where the temporary WAV chunk should be written.
     """
-    # Tokenize the input string into standard PyTorch tensors
-    inputs = tokenizer(text, return_tensors="pt")
 
-    # Disable gradient computation for faster inference and lower memory usage
+    # Clean text
+    text = str(text).strip()
+    text = text.replace("\n", " ")
+
+    # Tokenize
+    inputs = tokenizer(
+        text,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512
+    )
+
+    # Force correct tensor types for MMS/VITS
+    if "input_ids" in inputs:
+        inputs["input_ids"] = inputs["input_ids"].to(torch.long)
+
+    if "attention_mask" in inputs:
+        inputs["attention_mask"] = inputs["attention_mask"].to(torch.long)
+
+    # Debug
+    print("input_ids dtype:", inputs["input_ids"].dtype)
+
+    print("=" * 50)
+    print("TEXT:")
+    print(repr(text))
+    print("TOKENS:", inputs["input_ids"].shape)
+    print("=" * 50)
+
+    # Skip empty or very short inputs
+    if inputs["input_ids"].shape[1] < 2:
+        print("Skipping invalid chunk")
+        return
+
+    # Generate speech
     with torch.no_grad():
         output = model(**inputs).waveform
 
-    # Squeeze extra dimensions, pull the array from GPU (if applicable) to CPU, and convert to NumPy
     waveform = output.squeeze().cpu().numpy()
 
-    # Save waveform as a standard audio file using soundfile at the model's target sampling rate (usually 16000Hz or 22050Hz)
     sf.write(
         output_path,
         waveform,
@@ -201,21 +219,31 @@ def generate_tts(text, language, output_path):
 
     # Synthesize each individual text segment
     for idx, chunk in enumerate(chunks):
+
+        chunk = str(chunk).strip()
+        chunk = chunk.replace("\n", " ")
+
         chunk_path = os.path.join(
-            temp_dir,
-            f"chunk_{idx}.wav"
+        temp_dir,
+        f"chunk_{idx}.wav"
         )
 
         print(f"Generating chunk {idx + 1}/{len(chunks)}")
 
-        generate_single_chunk(
-            chunk,
-            tokenizer,
-            model,
-            chunk_path
-        )
+        try:
+            generate_single_chunk(
+                chunk,
+                tokenizer,
+                model,
+                chunk_path
+            )
 
-        chunk_files.append(chunk_path)
+            if os.path.exists(chunk_path):
+                chunk_files.append(chunk_path)
+
+        except Exception as e:
+            print(f"Skipping chunk due to error: {e}")
+            print("Chunk text:", repr(chunk))
 
     # Ensure output parent directory is available
     os.makedirs(
