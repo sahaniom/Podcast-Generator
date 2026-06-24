@@ -348,6 +348,28 @@ through:
 
 ---
 
+---
+
+## 🔧 Tech Stack
+
+This project uses a Python-first stack with modular libraries and tools for LLM orchestration, translation, speech synthesis, and audio processing.
+
+- **Language:** Python 3.8+
+- **Web UI / Orchestration:** Streamlit (main app and download UI), plain Python scripts for orchestration (`main.py`, `app.py`)
+- **LLM / Prompting:** Local/hosted LLMs via custom clients (see `llm/ollama_client.py`) and prompt code in `llm/`; compatible with Ollama-style models and other LLM backends
+- **Speech-to-Text:** Whisper-family model integrations (versions present in `SN-echoes/whisper_*`) and transcript extractors in `transcript/` and `youtube_video_transcript/`
+- **Translation:** Custom translation wrappers and Indic-focused translator (`translation/indictrans2_translator.py`, `translation/translator.py`)
+- **Text-to-Speech:** Multilingual TTS modules (`tts/mms_tts.py`, `tts/dialogue_tts.py`) and project-specific TTS orchestration
+- **Audio Processing & Mixing:** Pydub + `ffmpeg` for concatenation, fades, volume balancing, and music mixing (`audio_processing/podcast_mixer.py`)
+- **ML / Model Libraries:** Hugging Face `transformers` ecosystem and PyTorch-compatible model usage for model inference and light training tasks
+- **Data / Storage:** JSON and local caching of intermediate outputs (JSON/JSONL); model checkpoints and large dataset artifacts are kept out-of-band
+- **Utilities & Helpers:** `utils/` for speaker/tag handling, `processing/` for chunking and text processing
+- **Dev & Tests:** Virtual environment (`venv`) with `requirements.txt` style dependency management and tests using `pytest` (`test_*.py` files present)
+- **CLI / Automation:** Python scripts in `scripts/` for dataset preparation and pipeline runs
+- **External Tools / Runtime:** `ffmpeg` (system dependency) and Git for version control
+
+The architecture favors modular, replaceable components so individual pieces (LLMs, TTS engines, translation backends) can be swapped or upgraded without rewriting the pipeline.
+
 # 🏁 Final Outcome
 
 This project became more than an AI demo.
