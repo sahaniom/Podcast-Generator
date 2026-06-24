@@ -7,9 +7,9 @@
 │--------------------------------------------------------------------------│
 │ • Accepts YouTube URL                                                    │
 │ • Language Selection                                                     │
-│ • Starts Podcast Generation Pipeline                                     │
+│ • Starts Summary or Podcast Generation Pipeline                          │
 │ • Audio Playback                                                         │
-│ • Podcast Download                                                       │
+│ • Separate Summary and Podcast Download                                  │
 └───────────────────────────────┬──────────────────────────────────────────┘
                                 │
                                 ▼
@@ -21,10 +21,10 @@
 │ • Input validation                                                       │
 │ • Reverse caching logic                                                  │
 │ • Coordinates all AI modules                                             │
-│ • Handles podcast + summary generation flow                              │
-│ • Executes translation + TTS + mixing                                    │
-│ • Merges spoken summary with the final mixed podcast                     │
-│ • Returns final podcast path                                             │
+│ • Handles separate summary and podcast generation flows                  │
+│ • Executes translation + TTS + mixing for the podcast path               │
+│ • Caches summary audio independently                                     │
+│ • Returns the relevant generated artifact path                           │
 └───────────────────────────────┬──────────────────────────────────────────┘
                                 │
                 ┌───────────────┴────────────────┐
@@ -278,16 +278,16 @@
 
                                 ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                    main.py audio merge stage                            │
+│                  main.py output stages                                   │
 │--------------------------------------------------------------------------│
-│ INPUT: Summary WAV + Mixed podcast body WAV                              │
+│ INPUT: Summary WAV + Podcast WAV                                          │
 │                                                                          │
 │ Responsibilities:                                                        │
-│ • Prefix the spoken summary before the main podcast                      │
-│ • Insert a short silent pause between both segments                      │
-│ • Export the final combined podcast file                                 │
+│ • Export the summary audio as a standalone file                          │
+│ • Export the podcast audio with intro, background, and outro music      │
+│ • Keep the summary download separate from the podcast download          │
 │                                                                          │
-│ OUTPUT: Final cinematic podcast                                          │
+│ OUTPUTS: Separate summary audio and final podcast audio                  │
 └──────────────────────────────────────────────────────────────────────────┘
 
 

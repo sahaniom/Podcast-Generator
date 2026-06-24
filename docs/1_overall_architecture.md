@@ -20,19 +20,15 @@ Summary Translation              LLM Podcast Script Generation    │
  ↓                               ↓                                │
 Summary TTS                      Multi-Speaker Dialogue Formatting │
  ↓                               ↓                                │
- └───────────────┬───────────────┴────────────────────────────────┘
-                 ↓
-         Multilingual Translation
-                 ↓
-         Dialogue-Aware TTS
-                 ↓
-         Podcast Music Mixing
-                 ↓
-      Summary + Podcast Audio Merge
-                 ↓
-          Final Podcast Output
-                 ↓
-             Streamlit UI
+ Summary Audio Output             Multilingual Translation        │
+                      ↓                              │
+                  Dialogue-Aware TTS                    │
+                      ↓                              │
+                  Podcast Music Mixing                  │
+                      ↓                              │
+                  Final Podcast Output                  │
+                      ↓                              │
+                 Streamlit UI                        │
 ```
 
 ---
@@ -76,7 +72,7 @@ Responsibilities:
 * pipeline execution
 * coordination between modules
 * summary generation and summary-specific caching
-* final audio assembly by merging summary narration with the mixed podcast
+* separate summary audio generation and podcast audio assembly
 
 ---
 
@@ -480,7 +476,6 @@ Listen/download
                 └─────────┬───────────┘
                           ↓
                 ┌─────────────────────┐
-                │      main.py        │
                 │ Pipeline Controller │
                 └─────────┬───────────┘
                           ↓
@@ -491,26 +486,27 @@ Listen/download
         ┌─────────────────────────────────┐
         │ Sport Detection + Extraction    │
         └─────────────────────────────────┘
-                          ↓
-        ┌─────────────────────────────────┐
-        │ Podcast Script Generation       │
-        └─────────────────────────────────┘
-                          ↓
-        ┌─────────────────────────────────┐
-        │ Dialogue-Aware Translation      │
-        └─────────────────────────────────┘
-                          ↓
-        ┌─────────────────────────────────┐
-        │ Dialogue-Aware TTS              │
-        └─────────────────────────────────┘
-                          ↓
-        ┌─────────────────────────────────┐
-        │ Audio Mixing & Enhancement      │
-        └─────────────────────────────────┘
-                          ↓
-                ┌─────────────────────┐
-                │ Final Podcast WAV   │
-                └─────────────────────┘
+                          ├───────────────────────────────────────┐
+                          ↓                                       ↓
+        ┌─────────────────────────────────┐        ┌──────────────────────────┐
+        │ Summary Generation Layer        │        │ Podcast Script Generation│
+        └─────────────────────────────────┘        └──────────────────────────┘
+                          ↓                                       ↓
+        ┌─────────────────────────────────┐        ┌──────────────────────────┐
+        │ Summary Translation + TTS       │        │ Dialogue-Aware Translation│
+        └─────────────────────────────────┘        └──────────────────────────┘
+                          ↓                                       ↓
+        ┌─────────────────────────────────┐        ┌──────────────────────────┐
+        │ Final Summary Audio Output      │        │ Dialogue-Aware TTS       │
+        └─────────────────────────────────┘        └──────────────────────────┘
+                                                                  ↓
+                                                  ┌──────────────────────────┐
+                                                  │ Audio Mixing & Enhancement│
+                                                  └──────────────────────────┘
+                                                                  ↓
+                                                  ┌──────────────────────────┐
+                                                  │ Final Podcast WAV         │
+                                                  └──────────────────────────┘
 ```
 
 ---

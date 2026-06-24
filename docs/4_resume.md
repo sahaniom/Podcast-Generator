@@ -30,12 +30,13 @@ This is strong for:
 ### AI Multilingual Podcast Generator
 **Python, LLMs, IndicTrans2, Meta MMS-TTS, Streamlit, Pydub**
 
-- Built an end-to-end AI-powered multilingual podcast generation platform that converts YouTube sports videos into summary-first conversational podcast audio.
+- Built an end-to-end AI-powered multilingual podcast generation platform that converts YouTube sports videos into separate summary audio and conversational podcast audio.
 - Developed a modular pipeline for transcript extraction, sports event understanding, LLM-based summary and script generation, multilingual translation, and text-to-speech synthesis.
 - Implemented dialogue-aware translation and speaker-based podcast generation using HOST/GUEST/NARRATOR conversational architecture.
-- Integrated multilingual TTS using Meta MMS models with chunked audio synthesis, summary narration, audio stitching, and background music mixing for realistic podcast output.
+- Integrated multilingual TTS using Meta MMS models with chunked audio synthesis and background music mixing for realistic podcast output.
+- Added separate summary audio generation and download support alongside the main podcast output.
 - Designed scalable orchestration and reverse caching mechanisms to optimize repeated summary, script, translation, and audio generation workflows.
-- Built an interactive web interface using Streamlit for podcast generation, playback, and download support.
+- Built an interactive web interface using Streamlit for separate summary and podcast generation, playback, and download support.
 ```
 
 ---
@@ -47,17 +48,19 @@ This is strong for:
 {\textbf{AI Multilingual Podcast Generator} $|$ \emph{Python, LLMs, IndicTrans2, Meta MMS-TTS, Streamlit, Pydub}}{}
 
 \resumeItemListStart
-\resumeItem{Built an end-to-end AI-powered multilingual podcast generation platform that converts YouTube sports videos into summary-first conversational podcast audio.}
+\resumeItem{Built an end-to-end AI-powered multilingual podcast generation platform that converts YouTube sports videos into separate summary audio and conversational podcast audio.}
 
 \resumeItem{Developed a modular pipeline for transcript extraction, sports event understanding, LLM-based summary and script generation, multilingual translation, and text-to-speech synthesis.}
 
 \resumeItem{Implemented dialogue-aware translation and speaker-based podcast generation using HOST/GUEST/NARRATOR conversational architecture.}
 
-\resumeItem{Integrated multilingual TTS using Meta MMS models with chunked audio synthesis, summary narration, audio stitching, and background music mixing for realistic podcast output.}
+\resumeItem{Integrated multilingual TTS using Meta MMS models with chunked audio synthesis and background music mixing for realistic podcast output.}
+
+\resumeItem{Added separate summary audio generation and download support alongside the main podcast output.}
 
 \resumeItem{Designed scalable orchestration and reverse caching mechanisms to optimize repeated summary, script, translation, and audio generation workflows.}
 
-\resumeItem{Built an interactive web interface using Streamlit for podcast generation, playback, and download support.}
+\resumeItem{Built an interactive web interface using Streamlit for separate summary and podcast generation, playback, and download support.}
 \resumeItemListEnd
 ```
 
@@ -91,9 +94,9 @@ tutorial copy-paste project
 ### AI Multilingual Podcast Generator
 **Python, LLMs, IndicTrans2, Meta MMS-TTS, Streamlit**
 
-- Built an AI-powered system that converts YouTube sports videos into multilingual summary-first conversational podcast audio.
+- Built an AI-powered system that converts YouTube sports videos into separate multilingual summary audio and conversational podcast audio.
 - Developed modular pipelines for transcript extraction, LLM-based summary and podcast generation, multilingual translation, and TTS synthesis.
-- Implemented dialogue-aware translation, chunked speech synthesis, summary narration, audio stitching, and podcast-style music mixing.
+- Implemented dialogue-aware translation, chunked speech synthesis, separate summary audio generation, audio stitching, and podcast-style music mixing.
 ```
 
 ---

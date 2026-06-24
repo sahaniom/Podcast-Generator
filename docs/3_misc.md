@@ -30,14 +30,14 @@ This project goes far beyond that by building a complete:
 The system:
 
 * extracts sports commentary from YouTube videos
-* generates a short match summary alongside the full podcast script
+* generates a short match summary separately from the full podcast script
 * understands match events using LLMs
 * generates dynamic multi-speaker podcast scripts
 * translates them into multiple Indic languages
 * synthesizes natural speech using multilingual TTS
-* prepends a spoken summary before the main podcast audio
+* exports the summary as its own audio file
 * mixes cinematic podcast audio with music
-* delivers a complete downloadable podcast experience through a web UI
+* delivers separate summary and podcast downloads through a web UI
 
 Unlike many AI demos, this project combines:
 
@@ -159,7 +159,7 @@ The latest version of the pipeline now creates two related deliverables from the
 * a detailed multi-speaker podcast script
 * a shorter match summary
 
-That summary is translated, converted into speech, and inserted before the main podcast so listeners hear a concise recap before the longer discussion starts.
+That summary is translated and converted into its own downloadable audio file, while the podcast output remains a separate music-mixed audio file.
 
 ---
 
@@ -224,6 +224,7 @@ Core MVP capabilities include:
 
 * YouTube transcript extraction
 * short spoken match summary generation
+* summary audio generation and download
 * sports event understanding
 * podcast-style script generation
 * multilingual translation

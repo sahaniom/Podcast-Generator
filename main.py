@@ -90,6 +90,125 @@ def save_audio_path(video_id, language):
     )
 
 
+def save_summary_audio_path(video_id, language):
+    """
+    Returns the cached summary audio output path for a specific language and video ID.
+    """
+    folder_path = os.path.join("audio", video_id)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path, exist_ok=True)
+
+    return os.path.join(
+        folder_path,
+        f"summary_{language.lower()}.wav"
+    )
+
+
+def generate_summary_only(url=None, target_language=None):
+    """
+    Generate only the summary text for the selected language.
+    Returns the summary text so the UI can display it separately from the podcast.
+    """
+    if not url:
+        url = input("Enter YouTube URL: ").strip()
+
+    if not target_language:
+        target_language = input("Enter target language: ").strip().title()
+
+    video_id = extract_video_id(url)
+
+    if target_language not in SUPPORTED_LANGUAGES:
+        raise ValueError(f"Unsupported language: {target_language}")
+
+    summary_en_path = os.path.join("scripts", video_id, "summary_english.txt")
+    summary_translated_path = os.path.join(
+        "scripts", video_id, f"summary_{target_language.lower()}.txt"
+    )
+
+    translated_summary_script = None
+
+    if target_language == "English":
+        if os.path.exists(summary_en_path):
+            with open(summary_en_path, "r", encoding="utf-8") as f:
+                translated_summary_script = f.read()
+        else:
+            transcript = get_transcript(url)
+            sport = detect_sport(transcript)
+            translated_summary_script = generate_summary(transcript, sport)
+            os.makedirs(os.path.dirname(summary_en_path), exist_ok=True)
+            with open(summary_en_path, "w", encoding="utf-8") as f:
+                f.write(translated_summary_script)
+            print(f"✅ English summary saved to {summary_en_path}")
+    else:
+        if os.path.exists(summary_translated_path):
+            with open(summary_translated_path, "r", encoding="utf-8") as f:
+                translated_summary_script = f.read()
+        elif os.path.exists(summary_en_path):
+            with open(summary_en_path, "r", encoding="utf-8") as f:
+                summary_script = f.read()
+            translated_summary_script = translate_to_indic(
+                summary_script,
+                target_language
+            )
+            os.makedirs(os.path.dirname(summary_translated_path), exist_ok=True)
+            with open(summary_translated_path, "w", encoding="utf-8") as f:
+                f.write(translated_summary_script)
+            print(f"✅ Translated summary saved to {summary_translated_path}")
+        else:
+            transcript = get_transcript(url)
+            sport = detect_sport(transcript)
+            summary_script = generate_summary(transcript, sport)
+            os.makedirs(os.path.dirname(summary_en_path), exist_ok=True)
+            with open(summary_en_path, "w", encoding="utf-8") as f:
+                f.write(summary_script)
+            print(f"✅ English summary saved to {summary_en_path}")
+
+            translated_summary_script = translate_to_indic(
+                summary_script,
+                target_language
+            )
+            with open(summary_translated_path, "w", encoding="utf-8") as f:
+                f.write(translated_summary_script)
+            print(f"✅ Translated summary saved to {summary_translated_path}")
+
+    print(f"\n--- {target_language.upper()} SUMMARY ---\n")
+    print(translated_summary_script)
+
+    return translated_summary_script
+
+
+def generate_summary_audio(url=None, target_language=None):
+    """
+    Generate or load the summary text, synthesize summary audio, and return its path.
+    """
+    if not url:
+        url = input("Enter YouTube URL: ").strip()
+
+    if not target_language:
+        target_language = input("Enter target language: ").strip().title()
+
+    video_id = extract_video_id(url)
+
+    summary_audio_path = save_summary_audio_path(video_id, target_language)
+
+    if not os.path.exists(summary_audio_path):
+        summary_text = generate_summary_only(url=url, target_language=target_language)
+        summary_phrase = SUMMARY_PHRASES.get(target_language, "Summary of the match")
+        full_summary_text = f"{summary_phrase}. {summary_text}"
+
+        print(f"\nGenerating {target_language} summary audio...")
+        generate_tts(
+            text=full_summary_text,
+            language=target_language,
+            output_path=summary_audio_path
+        )
+        print(f"✅ Summary audio saved at: {summary_audio_path}")
+    else:
+        print(f"✅ Summary audio already exists at: {summary_audio_path}")
+
+    return summary_audio_path
+
+
 def combine_summary_and_podcast(summary_audio_path, podcast_audio_path, output_path):
     """
     Combines the summary audio and the podcast audio with a short pause in between.
@@ -109,58 +228,27 @@ def combine_summary_and_podcast(summary_audio_path, podcast_audio_path, output_p
 
 def main(url=None, target_language=None):
     """
-    Main entry point for the Podcast Generator pipeline.
-    
-    This function coordinates the sequential tasks required to turn a YouTube video
-    into a synthesized local-language podcast:
-      1. Prompt for target language and validate it against supported models.
-      2. Check caching rules in reverse order (Translated Script -> English Script -> Full Pipeline).
-      3. If no cached script exists:
-         - Download/extract the video transcript (with fallback to Whisper transcription).
-         - Detect the specific sport for contextual relevance.
-         - Clear temporary/debug files from previous extraction attempts.
-         - Perform structured info extraction using local LLMs.
-         - Generate a dynamic, conversational English podcast script.
-         - Save the English script.
-      4. Translate the English podcast script using the IndicTrans2 translation module.
-      5. Generate high-quality text-to-speech audio using Meta's MMS TTS models.
-      6. Display results and output the execution benchmarks.
+    Main entry point for podcast generation.
+    Returns the final podcast audio path with intro, background, and outro music.
     """
-    # Start tracking total pipeline execution time
     start_time = time.time()
 
-    # Define the default target YouTube video URL
-    # url = "https://www.youtube.com/watch?v=MAm0RLQpYas"
     if not url:
         url = input("Enter YouTube URL: ").strip()
 
     if not target_language:
-        target_language = input(
-            "Enter target language: "
-        ).strip().title()
-    video_id = extract_video_id(url)
-    
-    # Prompt the user to input the desired Indian language for the podcast
-    # target_language = input("Enter target language: ").strip().title()
+        target_language = input("Enter target language: ").strip().title()
 
-    # Stop execution early if the user selects an unsupported language
+    video_id = extract_video_id(url)
+
     if target_language not in SUPPORTED_LANGUAGES:
         raise ValueError(f"Unsupported language: {target_language}")
 
-    # Set up expected file system paths for intermediate and final assets
     en_script_path = os.path.join("scripts", video_id, "english.txt")
     translated_script_path = os.path.join(
-        "scripts", video_id, f"{target_language.lower()}.txt")
-    
-    summary_en_path = os.path.join("scripts", video_id, "summary_english.txt")
-    summary_translated_path = os.path.join(
-        "scripts", video_id, f"summary_{target_language.lower()}.txt"
+        "scripts", video_id, f"{target_language.lower()}.txt"
     )
-    
     audio_output_path = save_audio_path(video_id, target_language)
-    summary_audio_path = os.path.join(
-        "audio", video_id, f"summary_{target_language.lower()}.wav"
-    )
     final_podcast_path = os.path.join(
         "outputs",
         video_id,
@@ -169,153 +257,59 @@ def main(url=None, target_language=None):
 
     podcast_script = None
     translated_script = None
-    summary_script = None
-    translated_summary_script = None
 
-    # -------------------------------------------------------------------------
-    # REVERSE CACHING LOGIC
-    # This prevents running heavy LLM or translation pipelines if work is already done.
-    # -------------------------------------------------------------------------
-    
-    # Check Case A: The translated script already exists.
-    # We can load it and skip both English generation and translation.
     if os.path.exists(translated_script_path):
         print(
-            f"\n✅ Translated script found for {target_language} at {translated_script_path}")
+            f"\n✅ Translated script found for {target_language} at {translated_script_path}"
+        )
         with open(translated_script_path, "r", encoding="utf-8") as f:
             translated_script = f.read()
-
-    # Check Case B: The English script exists but translation is missing.
-    # We load the English script and proceed directly to translation.
     elif os.path.exists(en_script_path):
         print(f"\n✅ English podcast script found at {en_script_path}")
         with open(en_script_path, "r", encoding="utf-8") as f:
             podcast_script = f.read()
-            
-    # Check if summary scripts already exist in cache
-    if os.path.exists(summary_translated_path):
-        print(f"✅ Translated summary found at {summary_translated_path}")
-        with open(summary_translated_path, "r", encoding="utf-8") as f:
-            translated_summary_script = f.read()
-    elif os.path.exists(summary_en_path):
-        print(f"✅ English summary found at {summary_en_path}")
-        with open(summary_en_path, "r", encoding="utf-8") as f:
-            summary_script = f.read()
 
-    # Check Case C: No scripts exist. We must run the full ingestion & generation pipeline.
     if not translated_script and not podcast_script:
-        # Step 1: Ingest transcript (via API or local faster-whisper fallback)
         print("Fetching transcript...")
         transcript = get_transcript(url)
 
-        # -----------------------------
-        # STEP 1: SPORT DETECTION
-        # Determines if it's cricket, football, etc. to supply context for prompts
-        # -----------------------------
         print("\nDetecting sport...")
         sport = detect_sport(transcript)
         print(f"Detected sport: {sport}")
 
-        # Clean up temporary state files left behind by LLM chunking processes
-        for f in ["llm_chunk_state.json", "llm_chunk_results.jsonl", "main_output.txt", "debug_llm_output.txt"]:
-            if os.path.exists(f):
-                os.remove(f)
+        for file_name in [
+            "llm_chunk_state.json",
+            "llm_chunk_results.jsonl",
+            "main_output.txt",
+            "debug_llm_output.txt",
+        ]:
+            if os.path.exists(file_name):
+                os.remove(file_name)
 
-        # -----------------------------
-        # STEP 1.5: SUMMARY GENERATION
-        # -----------------------------
-        if not summary_script and not translated_summary_script:
-            summary_script = generate_summary(transcript, sport)
-            os.makedirs(os.path.dirname(summary_en_path), exist_ok=True)
-            with open(summary_en_path, "w", encoding="utf-8") as f:
-                f.write(summary_script)
-            print(f"✅ English summary saved to {summary_en_path}")
-
-        # -----------------------------
-        # STEP 2: STRUCTURED EXTRACTION
-        # -----------------------------
         print("\nExtracting structured data...")
         structured_output = llm_extract(transcript, sport)
 
-        # -----------------------------
-        # STEP 3: PODCAST SCRIPT GENERATION
-        # -----------------------------
         print("\nGenerating podcast script...")
         podcast_script = generate_podcast_script(structured_output)
         save_script(video_id, "english", podcast_script)
         print(f"✅ English script saved to {en_script_path}")
 
-    # Ensure summary is generated if not loaded from cache
-    if not summary_script and not translated_summary_script:
-        # Fetch transcript (fast, since it's cached)
-        transcript = get_transcript(url)
-        sport = detect_sport(transcript)
-        summary_script = generate_summary(transcript, sport)
-        os.makedirs(os.path.dirname(summary_en_path), exist_ok=True)
-        with open(summary_en_path, "w", encoding="utf-8") as f:
-            f.write(summary_script)
-        print(f"✅ English summary saved to {summary_en_path}")
-
-    # -----------------------------
-    # STEP 4: TRANSLATION
-    # -----------------------------
-    # Translate the English script if the translated version isn't already available
     if target_language == "English":
         if podcast_script:
             translated_script = podcast_script
         else:
-            with open(
-                en_script_path,
-                "r",
-                encoding="utf-8"
-            ) as f:
+            with open(en_script_path, "r", encoding="utf-8") as f:
                 translated_script = f.read()
-
         print("\nSkipping translation for English.")
+    elif not translated_script and podcast_script:
+        print(f"\nTranslating script to {target_language}...")
+        translated_script = translate_script(
+            podcast_script,
+            target_language
+        )
+        save_script(video_id, target_language, translated_script)
+        print(f"✅ Translated script saved to {translated_script_path}")
 
-        if summary_script:
-            translated_summary_script = summary_script
-        else:
-            with open(summary_en_path, "r", encoding="utf-8") as f:
-                translated_summary_script = f.read()
-
-    else:
-        if not translated_script and podcast_script:
-            print(f"\nTranslating script to {target_language}...")
-            translated_script = translate_script(
-                podcast_script,
-                target_language
-            )
-
-            save_script(
-                video_id,
-                target_language,
-                translated_script
-            )
-
-            print(
-                f"✅ Translated script saved to "
-                f"{translated_script_path}"
-            )
-
-        if not translated_summary_script and summary_script:
-            print(f"\nTranslating summary to {target_language}...")
-            translated_summary_script = translate_to_indic(
-                summary_script,
-                target_language
-            )
-            with open(summary_translated_path, "w", encoding="utf-8") as f:
-                f.write(translated_summary_script)
-            print(f"✅ Translated summary saved to {summary_translated_path}")
-
-    # Prepare speech text for summary (includes introductory phrase)
-    summary_phrase = SUMMARY_PHRASES.get(target_language, "Summary of the match")
-    full_summary_text = f"{summary_phrase}. {translated_summary_script}"
-
-    # -----------------------------
-    # STEP 5: TEXT-TO-SPEECH (TTS) AUDIO GENERATION
-    # -----------------------------
-    # Synthesize the audio files if they don't already exist
     if translated_script:
         if not os.path.exists(audio_output_path):
             print(f"\nGenerating {target_language} podcast audio...")
@@ -328,51 +322,19 @@ def main(url=None, target_language=None):
         else:
             print(f"\n✅ Audio already exists at: {audio_output_path}")
 
-        if not os.path.exists(summary_audio_path):
-            print(f"\nGenerating {target_language} summary audio...")
-            generate_tts(
-                text=full_summary_text,
-                language=target_language,
-                output_path=summary_audio_path
-            )
-            print(f"✅ Summary audio saved at: {summary_audio_path}")
-        else:
-            print(f"✅ Summary audio already exists at: {summary_audio_path}")
-
         if not os.path.exists(final_podcast_path):
             print("\nCreating final podcast with music...")
-            
-            temp_music_path = os.path.join(
-                "outputs",
-                video_id,
-                f"temp_{target_language.lower()}_podcast.wav"
-            )
-
             create_podcast(
                 voice_path=audio_output_path,
-                output_path=temp_music_path,
+                output_path=final_podcast_path,
                 intro_path="assets/intro_music.mp3",
                 background_path="assets/background_music.mp3",
                 outro_path="assets/outro_music.mp3"
             )
-
-            combine_summary_and_podcast(
-                summary_audio_path=summary_audio_path,
-                podcast_audio_path=temp_music_path,
-                output_path=final_podcast_path
-            )
-
-            if os.path.exists(temp_music_path):
-                os.remove(temp_music_path)
-
             print(f"✅ Final podcast saved at: {final_podcast_path}")
         else:
             print(f"✅ Final podcast already exists at: {final_podcast_path}")
 
-    # -----------------------------
-    # STEP 6: CONSOLE OUTPUT & BENCHMARKING
-    # -----------------------------
-    # Display the final text output in both English and the target language
     if podcast_script:
         print("\n--- PODCAST SCRIPT (EN) ---\n")
         print(podcast_script)
@@ -380,15 +342,6 @@ def main(url=None, target_language=None):
     if translated_script:
         print(f"\n--- {target_language.upper()} PODCAST ---\n")
         print(translated_script)
-
-    if summary_script:
-        print("\n--- SUMMARY SCRIPT (EN) ---\n")
-        print(summary_script)
-
-    if translated_summary_script:
-        print(f"\n--- {target_language.upper()} SUMMARY ---\n")
-        print(translated_summary_script)
-
 
     end_time = time.time()
     print(f"\nTotal execution time: {end_time - start_time:.2f} seconds")
