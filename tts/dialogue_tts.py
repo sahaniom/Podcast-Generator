@@ -7,6 +7,17 @@ from pydub import AudioSegment
 from tts.mms_tts import generate_tts
 
 
+def adjust_playback_speed(audio, speed):
+    """
+    Change playback speed without changing pitch too aggressively.
+    """
+    if speed == 1.0:
+        return audio
+
+    new_frame_rate = int(audio.frame_rate * speed)
+    return audio._spawn(audio.raw_data, overrides={"frame_rate": new_frame_rate}).set_frame_rate(audio.frame_rate)
+
+
 def parse_dialogue(script):
     """
     Extract structured speaker dialogue blocks.
@@ -48,7 +59,7 @@ def merge_dialogue_audio(dialogue_items, output_path):
 
     combined = AudioSegment.empty()
 
-    pause = AudioSegment.silent(duration=500)
+    pause = AudioSegment.silent(duration=900)
 
     for item in dialogue_items:
 
@@ -85,19 +96,20 @@ def apply_speaker_style(audio, speaker):
 
     if speaker == "HOST":
 
-        # Slightly louder + faster
+        # Slightly louder and calmer
         audio = audio + 2
-        audio = audio.speedup(playback_speed=1.05)
+        audio = adjust_playback_speed(audio, 0.94)
 
     elif speaker == "GUEST":
 
         # Slightly softer
         audio = audio - 1
+        audio = adjust_playback_speed(audio, 0.96)
 
     elif speaker == "NARRATOR":
 
         # Slower and calmer
-        audio = audio.speedup(playback_speed=0.95)
+        audio = adjust_playback_speed(audio, 0.90)
 
     return audio
 

@@ -1,6 +1,7 @@
 import json
 import time
 import os
+import re
 from pydub import AudioSegment
 from tts.mms_tts import generate_tts
 from tts.dialogue_tts import generate_dialogue_tts
@@ -15,7 +16,11 @@ from generation.podcast_script_generator import (
     generate_podcast_script
 )
 from translation.translator import translate_script
-from translation.indictrans2_translator import translate_to_indic
+from translation.indictrans2_translator import (
+    translate_to_indic,
+    clean_translated_text,
+    normalize_tts_text,
+)
 
 SUMMARY_PHRASES = {
     "English": "Summary of the match",
@@ -104,6 +109,34 @@ def save_summary_audio_path(video_id, language):
     )
 
 
+def normalize_generated_text(text, target_language):
+    """
+    Remove markdown artifacts and force native-script output for TTS.
+    """
+    text = clean_translated_text(text)
+    return normalize_tts_text(text, target_language)
+
+
+def format_dialogue_script(text):
+    """
+    Reflow a dialogue script so each speaker block stays on its own lines.
+    """
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    pattern = r"\[(HOST|GUEST|NARRATOR)\]\s*(.*?)(?=\s*\[(HOST|GUEST|NARRATOR)\]|\Z)"
+    matches = re.findall(pattern, text, re.DOTALL)
+
+    if not matches:
+        return text.strip()
+
+    blocks = []
+    for speaker, block_text, _ in matches:
+        cleaned_text = clean_translated_text(block_text)
+        if cleaned_text:
+            blocks.append(f"[{speaker}]\n{cleaned_text}")
+
+    return "\n\n".join(blocks)
+
+
 def generate_summary_only(url=None, target_language=None):
     """
     Generate only the summary text for the selected language.
@@ -170,6 +203,16 @@ def generate_summary_only(url=None, target_language=None):
             with open(summary_translated_path, "w", encoding="utf-8") as f:
                 f.write(translated_summary_script)
             print(f"✅ Translated summary saved to {summary_translated_path}")
+
+    if translated_summary_script:
+        translated_summary_script = normalize_generated_text(
+            translated_summary_script,
+            target_language
+        )
+        if target_language != "English":
+            os.makedirs(os.path.dirname(summary_translated_path), exist_ok=True)
+            with open(summary_translated_path, "w", encoding="utf-8") as f:
+                f.write(translated_summary_script)
 
     print(f"\n--- {target_language.upper()} SUMMARY ---\n")
     print(translated_summary_script)
@@ -309,6 +352,11 @@ def main(url=None, target_language=None):
         )
         save_script(video_id, target_language, translated_script)
         print(f"✅ Translated script saved to {translated_script_path}")
+
+    if translated_script:
+        translated_script = format_dialogue_script(translated_script)
+        if target_language != "English":
+            save_script(video_id, target_language, translated_script)
 
     if translated_script:
         if not os.path.exists(audio_output_path):
